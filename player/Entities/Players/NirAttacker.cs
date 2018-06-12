@@ -51,22 +51,8 @@ namespace RoboCup
                 }
                 else
                 {
-                    // We know where is ball and we can kick it
-                    // so look for goal
-                    if (m_side == 'l')
-                        obj = m_memory.GetSeenObject("goal r");
-                    else
-                        obj = m_memory.GetSeenObject("goal l");
-
-                    if (obj == null)
-                    {
-                        m_robot.Turn(40);
-                        m_memory.waitForNewInfo();
-                    }
-                    else
-                    {
-                        m_robot.Kick(25, obj.Direction.Value);
-                    }
+                    obj = FindGoal();
+                    m_robot.Kick(25, obj.Direction.Value);
                 }
 
                 // sleep one step to ensure that we will not send
@@ -80,6 +66,44 @@ namespace RoboCup
 
                 }
             }
+        }
+
+        private SeenObject FindGoal()
+        {
+            SeenObject obj;
+
+            while (!m_timeOver)
+            {
+                // We know where is ball and we can kick it
+                // so look for goal
+                if (m_side == 'l')
+                    obj = m_memory.GetSeenObject("goal r");
+                else
+                    obj = m_memory.GetSeenObject("goal l");
+
+                if (obj == null)
+                {
+                    m_robot.Turn(40);
+                    m_memory.waitForNewInfo();
+                }
+                else
+                {
+                    return obj;
+                }
+
+                // sleep one step to ensure that we will not send
+                // two commands in one cycle.
+                try
+                {
+                    Thread.Sleep(2 * SoccerParams.simulator_step);
+                }
+                catch (Exception e)
+                {
+
+                }
+            }
+
+            return null;
         }
 
         private SenseBodyInfo GetBodyInfo()
