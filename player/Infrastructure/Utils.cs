@@ -23,5 +23,29 @@ namespace RoboCup.Infrastructure
             const float epsilon = (float)0.00001;
             return (value1.X - value2.Y < epsilon) && (value1.Y - value2.Y < epsilon);
         }
+
+        
+        /// <summary>
+        /// Normalizes the input angle so that it belongs to the interval [-180, 180]
+        /// </summary>
+        /// <param name="a">the input angle to normalize</param>
+        public static float NormalizeAngle(double a)
+        {
+            if (Math.Abs(a) > 360.0)
+            {
+                a %= (360.0);
+            }
+            if (a > 180.0)
+            {
+                a -= 360.0;
+            }
+            if (a < -180.0)
+            {
+                a += 360.0;
+            }
+
+            return (float)a;
+        }
+
     }
 }

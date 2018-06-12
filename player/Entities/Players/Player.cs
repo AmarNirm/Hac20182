@@ -40,34 +40,10 @@ namespace RoboCup
             m_robot = new Robot(m_memory);
             m_robot.Init(team.m_teamName, out m_side, out m_number, out m_playMode);
 
-            Console.WriteLine("New Player - Team: " + m_team.m_teamName + " Side:" + m_side +" Num:" + m_number);
+            Console.WriteLine("New Player - Team: " + m_team.m_teamName + " Side:" + m_side + " Num:" + m_number);
 
             m_strategy = new Thread(play);
             m_strategy.Start();
-        }
-
-        public PointF GetGoalPosition(bool mine)
-        {
-            char targetGoal;
-            if (mine)
-            {
-                targetGoal = m_side;
-            }
-            else
-            {
-                targetGoal = m_side=='l'?'r':'l';
-            }
-            // get goal position
-            var goal = m_coach.GetSeenCoachObject($"goal {targetGoal}");
-            PointF goalPos = new PointF();
-            if (goal == null)
-            {
-            }
-            else
-            {
-                goalPos = goal.Pos.Value;
-            }
-            return goalPos;
         }
 
         /// <summary>
@@ -76,8 +52,6 @@ namespace RoboCup
         /// <returns></returns>
         private Position WhereToGo()
         {
-            // get goal position
-            var goalPos = GetGoalPosition(false);
             // get ball position
             var ball = m_coach.GetSeenCoachObject("ball");
             PointF ballPos = new PointF();
@@ -86,12 +60,12 @@ namespace RoboCup
             }
             else
             {
-                ballPos=ball.Pos.Value;
+                ballPos = ball.Pos.Value;
             }
             // calculate target position
-            float alpha = (float) Math.Atan((ballPos.Y - goalPos.Y) / (ballPos.X - goalPos.X));
-            var targetX = (float) (ballPos.X - Math.Cos(alpha));
-            var targetY = (float) (ballPos.Y + Math.Sin(alpha));
+            float alpha = (float)Math.Atan((ballPos.Y - OpponentGoal.Y) / (ballPos.X - OpponentGoal.X));
+            var targetX = (float)(ballPos.X - Math.Cos(alpha));
+            var targetY = (float)(ballPos.Y + Math.Sin(alpha));
             var targetPos = new PointF(targetX, targetY);
 
             float alphaDegrees = Utils.RadToDeg(alpha);
@@ -112,41 +86,164 @@ namespace RoboCup
 
         public void GoToBall()
         {
+            float relAngle;
             while (!Utils.IsSameLocation(GetBall().Pos.Value, GetCurrPlayer().Pos.Value))
             {
                 var targetPos = WhereToGo();
                 // Turn towards the target position
-                TurnTowardsPoint(targetPos.Point);
+                relAngle = CalcAngleToPoint(targetPos.Point);
+                m_robot.Turn(relAngle);
                 Thread.Sleep(100);
                 // Run
                 RunTowardsPoint(targetPos.Point);
                 Thread.Sleep(100);
             }
-            
-            // Turn towards the goal
-            TurnTowardsPoint(GetGoalPosition(false));
-        }
 
-        public void TurnTowardsPoint(PointF point)
-        {
-            SeenCoachObject myObj = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {m_number}");
-            var myAngle = myObj.BodyAngle.Value;
-            float alphaPlayerToTarget = (float)Math.Atan((point.Y - myObj.Pos.Value.Y) / (point.X - myObj.Pos.Value.X));
-            float alphaPlayerToTargetDegrees = Utils.RadToDeg(alphaPlayerToTarget);
-            var relAngle = alphaPlayerToTargetDegrees - myAngle;
+            // Turn towards the goal
+            relAngle = CalcAngleToPoint(OpponentGoal);
             m_robot.Turn(relAngle);
         }
 
-        public void RunTowardsPoint(PointF point)
+        /// <summary>
+        /// Moves to a given position (and angle)
+        /// </summary>
+        /// <param name="targetPos"></param>
+        /// <param name="targetTowards"></param>
+        /// <returns>true if got into the required position (including angle)</returns>
+        protected bool MoveToPosition(PointF targetPos, PointF targetTowards)
         {
-            SeenCoachObject myObj = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {m_number}");
-            var ballDistance = Utils.Distance(point, myObj.Pos.Value);
+            float distance = GetDistanceFrom(targetPos);
+            Debug.WriteLine($"distance to target = {distance}");
+            if (distance > DistanceThreshold)
+            {
+                float relAngle = CalcAngleToPoint(targetPos);
+                if (Math.Abs(relAngle) >= AngleThreshold)
+                {
+                    Console.WriteLine($"Player at side={m_side}, num={m_number} is turning {relAngle} degrees");
+                    m_robot.Turn(relAngle);
+                }
+                else
+                {
+                    // Slow down a bit when approaching the target
+                    Console.WriteLine($"Player at side={m_side}, num={m_number} is dashing to {targetPos}");
+                    m_robot.Dash(70 * distance);
+                }
+            }
+            else // Already got to the position, now just need to turn
+            {
+                if (targetTowards != null)
+                {
+                    float relAngle = CalcAngleToPoint(targetTowards);
+                    if (Math.Abs(relAngle) >= AngleThreshold)
+                    {
+                        Console.WriteLine($"Player at side={m_side}, num={m_number} is turning {relAngle} degrees");
+                        m_robot.Turn(relAngle);
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public float CalcAngleToPoint(PointF point)
+        {
+            SeenCoachObject myObj = GetCurrPlayer();
+            var myAngle = myObj.BodyAngle.Value;
+            var xp = myObj.Pos.Value.X;
+            var yp = myObj.Pos.Value.Y;
+            // TODO: deal with 0
+            float deltaY = point.Y - yp;
+            float deltaX = point.X - xp;
+            float alphaPlayerToTargetRad = (float)Math.Atan(deltaY / deltaX);
+            float alphaPlayerToTarget = Utils.RadToDeg(alphaPlayerToTargetRad);
+            float relAngle = 0;
+            //if (Math.Abs(deltaY) < 0.1)
+            //{
+            //    relAngle = -myAngle;
+            //}
+            if ((deltaY > 0 && deltaX > 0) || (deltaY < 0 && deltaX > 0)) // alpha > 0
+            {
+                relAngle = -myAngle + alphaPlayerToTarget;
+            }
+            else // alpha < 0
+            {
+                relAngle = -myAngle - (180 - alphaPlayerToTarget);
+            }
+            relAngle = Utils.NormalizeAngle(relAngle);
+            return relAngle;
+        }
+
+        protected void RunTowardsPoint(PointF point)
+        {
+            var ballDistance = GetDistanceFrom(point);
             m_robot.Dash(10 * ballDistance);
         }
 
-        public virtual  void play()
+        protected float GetDistanceFrom(PointF point)
         {
- 
+            SeenCoachObject myObj = GetCurrPlayer();
+            var distance = Utils.Distance(point, myObj.Pos.Value);
+            return distance;
+        }
+
+        public virtual void play()
+        {
+
+        }
+
+        private PointF? m_myGoal;
+        public PointF MyGoal
+        {
+            get
+            {
+                if (m_myGoal == null)
+                {
+                    m_myGoal = GetGoalPosition(true);
+                }
+                if (m_myGoal == null)
+                { // The field's width is 105
+                    if (m_side == 'r')
+                    {
+                        return new PointF(52.5f, 0);
+                    }
+                    else
+                    {
+                        return new PointF(-52.5f, 0);
+                    }
+                }
+                return m_myGoal.Value;
+            }
+        }
+
+        private PointF? m_opponentGoal;
+        public PointF OpponentGoal
+        {
+            get
+            {
+                if (m_opponentGoal == null)
+                {
+                    m_opponentGoal = GetGoalPosition(false);
+                }
+                if (m_opponentGoal == null)
+                { // The field's width is 105
+                    if (m_side == 'r')
+                    {
+                        return new PointF(-52.5f, 0);
+                    }
+                    else
+                    {
+                        return new PointF(52.5f, 0);
+                    }
+                }
+                return m_opponentGoal.Value;
+            }
         }
 
         protected SeenCoachObject GetBall()
@@ -180,14 +277,37 @@ namespace RoboCup
                 }
                 else
                 {
-                    Console.WriteLine((string)currPlayer.Name);
                     return currPlayer;
                 }
             }
             return null;
         }
 
-               public virtual int FindPlayerClosestToTheBall()
+        private PointF? GetGoalPosition(bool mine)
+        {
+            char targetGoal;
+            if (mine)
+            {
+                targetGoal = m_side;
+            }
+            else
+            {
+                targetGoal = m_side == 'l' ? 'r' : 'l';
+            }
+            // get goal position
+            var goal = m_coach.GetSeenCoachObject($"goal {targetGoal}");
+            PointF goalPos = new PointF();
+            if (goal == null)
+            {
+                return null;
+            }
+            else
+            {
+                return goal.Pos.Value;
+            }
+        }
+
+        public virtual int FindPlayerClosestToTheBall()
         {
             SeenCoachObject ballPosByCoach = null;
             SeenCoachObject objPlayer = null;
@@ -212,7 +332,7 @@ namespace RoboCup
                 {
                     playerListNum = i + 1;
                     ballPosByCoach = m_coach.GetSeenCoachObject("ball");
-                    
+
 
                     Double BallX = ballPosByCoach.Pos.Value.X;
                     Double BallY = ballPosByCoach.Pos.Value.Y;
@@ -238,5 +358,8 @@ namespace RoboCup
 
             return ClosestPlayerToTheBall;
         }
+
+        protected float DistanceThreshold = 0.4f;
+        protected float AngleThreshold = 1f;
     }
 }

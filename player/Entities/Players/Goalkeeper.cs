@@ -31,11 +31,20 @@ namespace player.Entities.Players
             MoveOnGoalLine,
             TurnToBall
         }
-
-        private bool MovedToGoal = false;
+        
         private bool Init = false;
 
-        public SeenCoachObject MyGoal { get; set; }
+        private PointF StartingPosition
+        {
+            get
+            {
+                if (m_startPosition == null)
+                {
+                    CalcStartingPosition();
+                }
+                return m_startPosition;
+            }
+        }
 
         private void TurnToBall()
         {
@@ -60,41 +69,18 @@ namespace player.Entities.Players
             }
         }
 
-        private void MoveToGoal()
+        private PointF CalcStartingPosition()
         {
-            var seenGoal = m_memory.GetSeenObject(m_side == 'l' ? "goal l" : "goal r");
-            if (seenGoal == null)
-            {
-                m_robot.Turn(40);
-                m_memory.waitForNewInfo();
-            }
-            else if (seenGoal.Distance.Value > 2)
-            {
-                // If ball is too far then turn to ball or if we have correct direction then go to ball
-                if (seenGoal.Direction.Value != 0)
-                    m_robot.Turn(seenGoal.Direction.Value);
-                else
-                    m_robot.Dash(100);
-            }
+            float startPosX;
+            var goalX = MyGoal.X;
+            startPosX = goalX > 0 ? goalX - GoalDistance : goalX + GoalDistance;
+            m_startPosition = new PointF(startPosX, 0);
+            return m_startPosition;
         }
 
         public override void play()
         {
-            MyGoal = m_coach.GetSeenCoachObject(m_side == 'l' ? "goal l" : "goal r");
-            float start_pos_x;
-            if (MyGoal != null)
-            {
-                var goal_x = MyGoal.Pos.Value.X;
-                start_pos_x = goal_x > 0 ? goal_x - GoalDistance : goal_x + GoalDistance;
-                Console.WriteLine("Golie going to " + start_pos_x);
-            }
-            else
-            {
-                start_pos_x = m_side == 'l' ? -51:51;
-                Console.WriteLine("Golie going to " + start_pos_x);
-            }
-
-            m_startPosition = new PointF(start_pos_x, 0);
+            CalcStartingPosition();
             // first move to start position
             m_robot.Move(m_startPosition.X, m_startPosition.Y);
 
@@ -122,13 +108,10 @@ namespace player.Entities.Players
                 {
                     if (!Init)
                     {
-                        if (!MovedToGoal)
+                        Init = MoveToPosition(StartingPosition, OpponentGoal);
+                        if (Init)
                         {
-                            MoveToGoal();
-                        }
-                        else
-                        {
-                            TurnToBall();
+                            Console.WriteLine("Goalkeeper in position!");
                         }
                     }
                     else
