@@ -4,6 +4,7 @@ using System.Threading;
 using RoboCup;
 using RoboCup.Entities;
 using RoboCup.Infrastructure;
+using System.Linq;
 
 namespace RoboCup
 {
@@ -184,6 +185,58 @@ namespace RoboCup
                 }
             }
             return null;
+        }
+
+               public virtual int FindPlayerClosestToTheBall()
+        {
+            SeenCoachObject ballPosByCoach = null;
+            SeenCoachObject objPlayer = null;
+            double Distance = -1;
+            double CurrentDistance = -1;
+            string player = "player ";
+            int playerListNum = 0;
+            int ClosestPlayerToTheBall = -1;
+
+
+            var PlayersList = m_coach.GetSeenCoachObjects().Where(kvp => kvp.Value.Name.Contains(m_team.m_teamName)).ToList();
+
+            if (PlayersList.Count > 2)
+                return 0;
+
+            Object thisLock = new Object();
+
+            lock (thisLock)
+            {
+
+                for (int i = 0; i < PlayersList.Count; i++)
+                {
+                    playerListNum = i + 1;
+                    ballPosByCoach = m_coach.GetSeenCoachObject("ball");
+                    
+
+                    Double BallX = ballPosByCoach.Pos.Value.X;
+                    Double BallY = ballPosByCoach.Pos.Value.Y;
+
+                    objPlayer = m_coach.GetSeenCoachObject(player + m_team.m_teamName + " " + playerListNum.ToString());
+                    Double PlayerX = objPlayer.Pos.Value.X;
+                    Double PlayerY = objPlayer.Pos.Value.Y;
+                    CurrentDistance = Math.Sqrt(Math.Pow(PlayerX - BallX, 2) + Math.Pow(PlayerY - BallY, 2));
+                    if (i == 1)
+                    {
+                        Distance = CurrentDistance;
+                        ClosestPlayerToTheBall = i;
+                    }
+                    else if (CurrentDistance < Distance)
+                    {
+                        Distance = CurrentDistance;
+                        ClosestPlayerToTheBall = i;
+                    }
+
+                }
+
+            }
+
+            return ClosestPlayerToTheBall;
         }
     }
 }
