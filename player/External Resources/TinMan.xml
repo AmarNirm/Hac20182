@@ -1,0 +1,1979 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TinMan</name>
+    </assembly>
+    <members>
+        <member name="T:TinMan.SoccerbotBody">
+            <summary>
+            Models the body of the Soccerbot robot.
+            </summary>
+            <remarks>
+            Note that the Soccerbot model has been replaced by <see cref="T:TinMan.NaoBody"/> for RoboCup
+            competitions.
+            </remarks>
+        </member>
+        <member name="T:TinMan.IBody">
+            <summary>
+            Interface for all agent bodies used in TinMan.  Two models that ship with SimSpark are already
+            implemented in TimMan, namely <see cref="T:TinMan.NaoBody"/> and <see cref="T:TinMan.SoccerbotBody"/>.
+            </summary>
+        </member>
+        <member name="M:TinMan.IBody.GetHingeForEffectorLabel(System.String)">
+            <summary>
+            Performs a lookup to find the <see cref="T:TinMan.Hinge"/> with specified effector label.
+            Returns <c>null</c> if no hinge is found.
+            </summary>
+            <param name="effectorLabel">The label of the hinge's effector.</param>
+            <returns>The <see cref="T:TinMan.Hinge"/> if found, otherwise <c>null</c>.</returns>
+        </member>
+        <member name="M:TinMan.IBody.ConvertCameraPolarToLocalVector(TinMan.Polar)">
+            <summary>
+            Converts a polar coordinate from the agent's view perspective (as is reported by vision
+            perceptors) into a vector in the agent's local coordinates.
+            </summary>
+            <param name="cameraView"></param>
+            <returns></returns>
+        </member>
+        <member name="P:TinMan.IBody.RsgPath">
+            <summary>
+            Gets a well-known path of the Ruby Scene Graph (RSG) file in the RCSS3D server package
+            for the model to be loaded for this agent's body.
+            </summary>
+        </member>
+        <member name="P:TinMan.IBody.AllHinges">
+            <summary>Gets all <see cref="T:TinMan.Hinge"/> instances in the agent's body.</summary>
+        </member>
+        <member name="M:TinMan.SoccerbotBody.ConvertCameraPolarToLocalVector(TinMan.Polar)">
+            <summary>Converts observation polar coordinates from camera space to a vector in torso space.</summary>
+        </member>
+        <member name="P:TinMan.SoccerbotBody.RsgPath">
+            <summary>Well-known path of the Ruby Scene Graph (RSG) file for the NAO model in the RCSS3D server package.</summary>
+        </member>
+        <member name="T:TinMan.RoboViz.Shape">
+            <summary>
+            Base class for all RoboViz shapes.
+            </summary>
+        </member>
+        <member name="M:TinMan.RoboViz.Shape.Remove">
+            <summary>
+            Removes this shape from its parent ShapeSet, and therefore the scene.  A removed shape may
+            be re-added to the parent later, or to a different ShapeSet if desired.
+            </summary>
+        </member>
+        <member name="P:TinMan.RoboViz.Shape.IsVisible">
+            <summary>Gets and sets a value that indicates whether this shape is visible or not.</summary>
+        </member>
+        <member name="T:TinMan.RoboViz.Dot">
+            <summary>
+            A coloured point in 3D space.  Its size remains the same regardless of its distance from the camera,
+            hence the size unit is pixels.  Note that `X`,`Y`,`Z` are equivalent to `Position`, so use whichever
+            is more convenient at the time.
+            </summary>
+        </member>
+        <member name="M:TinMan.RoboViz.Dot.#ctor">
+            <summary>Initialises a 5-pixel wide white <see cref="T:TinMan.RoboViz.Dot"/>.</summary>
+        </member>
+        <member name="T:TinMan.RoboViz.Line">
+            <summary>
+            A coloured line in 3D space which is finite in both directions -- i.e. it has two ends.
+            Its thickness remains the same regardless of its distance from the camera, hence its thickness unit is pixels.
+            Note that `X1`,`Y1`,`Z1` are equivalent to `End1` (likewise for `End2`), so use whichever is more convenient at the time.
+            </summary>
+        </member>
+        <member name="M:TinMan.RoboViz.Line.#ctor">
+            <summary>Initialises a 0-length <see cref="T:TinMan.RoboViz.Line"/> with both ends at the origin, drawn with a 1-pixel wide white line.</summary>
+        </member>
+        <member name="T:TinMan.RoboViz.Polygon">
+            <summary>
+            A borderless, filled polygon in 3D space formed from a list of vertices.
+            </summary>
+        </member>
+        <member name="M:TinMan.RoboViz.Polygon.#ctor">
+            <summary>Initialises a 0-vertex <see cref="T:TinMan.RoboViz.Polygon"/> of white color.</summary>
+        </member>
+        <member name="T:TinMan.RoboViz.Circle">
+            <summary>
+            An unfilled 2D circle, constrained to the horizontal plane of the field.  Its line thickness remains the same regardless
+            of its distance from the camera, hence the thickness unit is pixels.
+            </summary>
+            <remarks>Note that circles are always drawn on the plane of the field, and hence no Z position (elevation) is specified.</remarks>
+        </member>
+        <member name="M:TinMan.RoboViz.Circle.#ctor">
+            <summary>Initialises a 1-metre diameter <see cref="T:TinMan.RoboViz.Circle"/> centered at the origin, drawn with a 5-pixel wide white line.</summary>
+        </member>
+        <member name="M:TinMan.RoboViz.Circle.Translate(TinMan.Vector3)">
+            <remarks>Note that the translation of circles cannot lift them off the playing field.</remarks>
+        </member>
+        <member name="T:TinMan.RoboViz.Sphere">
+            <summary>
+            A solid sphere in 3D space.  Note that `X`,`Y`,`Z` are equivalent to `Center`, so use whichever is more
+            convenient at the time.
+            </summary>
+        </member>
+        <member name="M:TinMan.RoboViz.Sphere.#ctor">
+            <summary>Initialises a white 1-metre diameter <see cref="T:TinMan.RoboViz.Sphere"/> centered at the origin.</summary>
+        </member>
+        <member name="T:TinMan.RoboViz.FieldAnnotation">
+            <summary>
+            A coloured text label at a point in 3D space.
+            Note that `X`,`Y`,`Z` are equivalent to `Position`, so use whichever is more convenient at the time.
+            </summary>
+        </member>
+        <member name="M:TinMan.RoboViz.FieldAnnotation.#ctor">
+            <summary>Initialises a 5-pixel wide white <see cref="T:TinMan.RoboViz.Dot"/>.</summary>
+        </member>
+        <member name="T:TinMan.PidHingeController">
+            <summary>
+            A PID (Proportional, Integral, Derivative) controller that operates upon a single <see cref="P:TinMan.PidHingeController.Hinge"/>.
+            This class may operate as a P,PI,PD,etc controller by setting one or more of <see cref="P:TinMan.PidHingeController.ProportionalGain"/>,
+            <see cref="P:TinMan.PidHingeController.IntegralGain"/> and <see cref="P:TinMan.PidHingeController.DerivativeGain"/> to zero.
+            </summary>
+        </member>
+        <member name="M:TinMan.PidHingeController.#ctor(TinMan.Hinge)">
+            <summary>
+            Instantiates a new <see cref="T:TinMan.PidHingeController"/> for the specified <paramref name="hinge"/>.
+            </summary>
+            <param name="hinge">The hinge upon which this controller will operate.</param>
+            <exception cref="T:System.NullReferenceException"><paramref name="hinge"/> is <c>null</c>.</exception>
+        </member>
+        <member name="P:TinMan.PidHingeController.ProportionalGain">
+            <summary>Gets and sets the proportional gain constant, <em>Kp</em>.</summary>
+        </member>
+        <member name="P:TinMan.PidHingeController.IntegralGain">
+            <summary>Gets and sets the integral gain constant, <em>Ki</em>.</summary>
+        </member>
+        <member name="P:TinMan.PidHingeController.DerivativeGain">
+            <summary>Gets and sets the derivative gain constant, <em>Kd</em>.</summary>
+        </member>
+        <member name="P:TinMan.PidHingeController.Hinge">
+            <summary>Gets the <see cref="P:TinMan.PidHingeController.Hinge"/> for which this <see cref="T:TinMan.PidHingeController"/> was instantiated.</summary>
+        </member>
+        <member name="P:TinMan.PidHingeController.PreviousError">
+            <summary>Gets the error (in radians) observed during the last calculation.  This value is used to calculate
+            the short-term error, which in used as a predictor of future error, and will contribute to the output value
+            if <see cref="P:TinMan.PidHingeController.DerivativeGain"/> is non-zero.</summary>
+        </member>
+        <member name="P:TinMan.PidHingeController.Integral">
+            <summary>Gets the error integral observed during the last calculation.  This value serves as a 'memory'
+            of historic error, and will contribute to the output value if <see cref="P:TinMan.PidHingeController.IntegralGain"/> is non-zero.</summary>
+        </member>
+        <member name="P:TinMan.PidHingeController.TargetAngle">
+            <summary>
+            Gets and sets the target angle to which this <see cref="T:TinMan.PidHingeController"/> will regulate
+            <see cref="P:TinMan.PidHingeController.Hinge"/>.
+            </summary>
+        </member>
+        <member name="T:TinMan.NaoBody">
+            <summary>
+            Represents the body of the Nao model in the SimSpark simulator.  As of 2011, this model was the standard
+            model for RoboCup 3D Simulated Soccer competitions.
+            </summary>
+            <remarks>
+            The Nao humanoid robot manufactured by Aldebaran Robotics.
+            Its biped architecture has 22 degrees of freedom and allows Nao to have great mobility.
+            <see cref="T:TinMan.NaoBody"/> replaced the <see cref="T:TinMan.SoccerbotBody"/> as the default model for RoboCup competitive simulated 3D soccer.
+            Nao's field of view is restricted to 120 degrees.
+            </remarks>
+        </member>
+        <member name="F:TinMan.NaoBody.WeightKilograms">
+            <summary>Approximate weight of the Nao robot is 4.5kg.</summary>
+        </member>
+        <member name="F:TinMan.NaoBody.Height">
+            <summary>Approximate height of the Nao robot is 0.57m.</summary>
+        </member>
+        <member name="M:TinMan.NaoBody.#ctor">
+            <summary>
+            Initialises a new instance of <see cref="T:TinMan.NaoBody"/>.
+            </summary>
+        </member>
+        <member name="M:TinMan.NaoBody.ConvertCameraPolarToLocalVector(TinMan.Polar)">
+            <summary>Converts observation polar coordinates from camera space to a vector in torso space.</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.RsgPath">
+            <summary>Well-known path of the Ruby Scene Graph (RSG) file for the NAO model in the RCSS3D server package.</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.HJ1">
+            <summary>Neck joint.  Allows the head (and camera) to be panned left and right.  Zero degrees looks directly ahead.  Angles range -120 to 120 degrees.</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.HJ2">
+            <summary>Head joint.  Allows the head (and camera) to be tilted up and down. Zero degrees looks horizontally.  Angles range -45 to 45 degrees.</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.LAJ1">
+            <summary>Shoulder.  Allows the entire arm to rotate within a circle extending in front of, above, behind and below the shoulder.  Zero degrees points straight ahead.  Angles range -120 to 120 degrees.  Positive values raise the arm upwards above the head.</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.LAJ2">
+            <summary>Shoulder.  Allows the entire arm to extend such that the hand of a straighenend arm moves from the hip outwards away from the body.  Zero degrees keeps the arm within the circle governed by arm joint one.  Angles range -1 to 95 degrees.</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.LAJ3">
+            <summary>Allows the arm to rotate along its length between the shoulder and the elbow.  Angles range -120 to 120 degrees. At zero degrees the palm faces down if the arm is extended in front of the body.  Positive values rotate the hand clockwise (as viewed by the robot).</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.LAJ4">
+            <summary>Bends the arm at the elbow.  At zero degrees the arm is straight.  Angles range -90 to 1 degrees.</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.RAJ1">
+            <summary>Shoulder.  Allows the entire arm to rotate within a circle extending in front of, above, behind and below the shoulder.  Zero degrees points straight ahead.  Angles range -120 to 120 degrees.  Positive values raise the arm upwards above the head.</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.RAJ2">
+            <summary>Shoulder.  Allows the entire arm to extend such that the hand of a straighenend arm moves from the hip outwards away from the body.  Zero degrees keeps the arm within the circle governed by arm joint one.  Angles range -95 to 1 degrees.</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.RAJ3">
+            <summary>Allows the arm to rotate along its length between the shoulder and the elbow. Angles range -120 to 120 degrees. At zero degrees the palm faces down if the arm is extended in front of the body.  Positive values rotate the hand clockwise (as viewed by the robot).</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.RAJ4">
+            <summary>Bends the arm at the elbow.  At zero degrees the arm is straight.  Angles range -1 to 90 degrees.</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.LLJ1">
+            <summary>
+            Hip joint, allowing an extended leg to swing out to the side, such that it is parallel to the ground with 
+            the toes pointing upwards.  Unlike other joints, the first left and right leg joints are oriented at 45
+            degrees to the coordinate system, and the yaw pitch of both joints is locked such that they're both equal
+            at all times. At zero degrees, the legs are parallel in a standing posture.  Angles range -90 to 1 degree.
+            </summary>
+        </member>
+        <member name="P:TinMan.NaoBody.LLJ2">
+            <summary>Tilts the leg such that the hip is pushed sideways when standing.  At zero degrees, the leg's line is parallel to the torso's z axis, if the prior joint is also zero.  Angles range -25 to 45 degrees.</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.LLJ3">
+            <summary>Bends the leg from the hip such that the knee lifts forward towards the chest.  At zero degrees, the leg is extended straight down.  Angles range -25 to 100 degrees.</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.LLJ4">
+            <summary>Bends the leg at the knee such that the calf approaches the back of the thigh.  At zero degrees, the leg is straight.  Angles range -130 to 1 degrees.</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.LLJ5">
+            <summary>Bends the ankle such that toes lift towards the knee (positive angles) or point away down the length of the leg (negative values).  At zero degrees, the line running the length of the sole of the foot is perpendicular to the calf.  Angles range -45 to 75 degrees.</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.LLJ6">
+            <summary>Rolls the foot in and out (supine/pronate).  At zero degrees, the line running the width of the sole of the foot is perpendicular to the calf.  Angles range -45 to 25 degrees.</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.RLJ1">
+            <summary>
+            Hip joint, allowing an extended leg to swing out to the side, such that it is parallel to the ground with 
+            the toes pointing upwards.  Unlike other joints, the first left and right leg joints are oriented at 45
+            degrees to the coordinate system, and the yaw pitch of both joints is locked such that they're both equal
+            at all times. At zero degrees, the legs are parallel in a standing posture.  Angles range -90 to 1 degree.
+            </summary>
+        </member>
+        <member name="P:TinMan.NaoBody.RLJ2">
+            <summary>Tilts the leg such that the hip is pushed sideways when standing.  At zero degrees, the leg's line is parallel to the torso's z axis, if the prior joint is also zero.  Angles range -45 to 25 degrees.</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.RLJ3">
+            <summary>Bends the leg from the hip such that the knee lifts forward towards the chest.  At zero degrees, the leg is extended straight down.  Angles range -25 to 100 degrees.</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.RLJ4">
+            <summary>Bends the leg at the knee such that the calf approaches the back of the thigh.  At zero degrees, the leg is straight.  Angles range -130 to 1 degrees.</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.RLJ5">
+            <summary>Bends the ankle such that toes lift towards the knee (positive angles) or point away down the length of the leg (negative values).  At zero degrees, the line running the length of the sole of the foot is perpendicular to the calf.  Angles range -45 to 75 degrees.</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.RLJ6">
+            <summary>Rolls the foot in and out (supine/pronate).  At zero degrees, the line running the width of the sole of the foot is perpendicular to the calf.  Angles range -25 to 45 degrees.</summary>
+        </member>
+        <member name="P:TinMan.NaoBody.AllHinges">
+            <summary>Gets all <see cref="T:TinMan.Hinge"/> instances in the agent's body.</summary>
+        </member>
+        <member name="F:TinMan.RoboViz.RoboVizOptions.DefaultUdpPort">
+            <summary>The default UDP port exposed by the RoboViz monitor.</summary>
+        </member>
+        <member name="F:TinMan.RoboViz.RoboVizOptions.DefaultHostName">
+            <summary>The default host name, <c>localhost</c>.</summary>
+        </member>
+        <member name="M:TinMan.RoboViz.RoboVizRemote.#ctor(TinMan.IAgent)">
+            <summary>
+            Initialises an instance of <see cref="T:TinMan.RoboViz.RoboVizRemote"/> with default <see cref="T:TinMan.RoboViz.RoboVizOptions"/>.
+            This remote will be automatically disposed when the agent exits.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.RoboViz.RoboVizRemote.#ctor(TinMan.IAgent,TinMan.RoboViz.RoboVizOptions)">
+            <summary>
+            Initialises an instance of <see cref="T:TinMan.RoboViz.RoboVizRemote"/> with specified <paramref name="options"/>.
+            This remote will be automatically disposed when the agent exits.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:TinMan.Angle">
+            <summary>
+            Represents an angle as a double-precision floating point value.
+            This type is immutable.
+            </summary>
+        </member>
+        <member name="F:TinMan.Angle.Zero">
+            <summary>A constant angle of zero.</summary>
+        </member>
+        <member name="F:TinMan.Angle.NaN">
+            <summary>
+            Gets an angle whose value in degrees and radians is <see cref="F:System.Double.NaN"/>.
+            Returns <see cref="P:TinMan.Angle.IsNaN"/> as <c>true</c>.
+            </summary>
+        </member>
+        <member name="M:TinMan.Angle.FromRadians(System.Double)">
+            <summary>Creates an angle from a source value in radians.</summary>
+            <param name="radians"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.Angle.FromDegrees(System.Double)">
+            <summary>Creates an angle from a source value in degrees.</summary>
+            <param name="degrees"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.Angle.DegreesToRadians(System.Double)">
+            <summary>
+            Converts a number of degrees into a number of radians.  Generally speaking,
+            the use of the <see cref="T:TinMan.Angle"/> type obviates the need for these methods.
+            </summary>
+            <param name="degrees"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.Angle.RadiansToDegrees(System.Double)">
+            <summary>
+            Converts a number of radians into a number of degrees.  Generally speaking,
+            the use of the <see cref="T:TinMan.Angle"/> type obviates the need for these methods.
+            </summary>
+            <param name="radians"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.Angle.Normalise">
+            <summary>
+            Returns an equivalent angle within the range of [0,360) degrees.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.Angle.Limit(TinMan.Angle,TinMan.Angle)">
+            <summary>
+            Returns the angle nearest to this that is within the range from <paramref name="lowerLimit"/>
+            and <paramref name="upperLimit"/>.  The returned value is clamped within the specified limits.
+            </summary>
+            <param name="lowerLimit"></param>
+            <param name="upperLimit"></param>
+            <returns></returns>
+        </member>
+        <member name="P:TinMan.Angle.Radians">
+            <summary>Gets the angle as a double value in radians per second.</summary>
+        </member>
+        <member name="P:TinMan.Angle.Degrees">
+            <summary>Gets the angle as a double value in degrees per second.</summary>
+        </member>
+        <member name="P:TinMan.Angle.Cos">
+            <summary>Gets the cosine of this angle.</summary>
+        </member>
+        <member name="P:TinMan.Angle.Sin">
+            <summary>Gets the sine of this angle.</summary>
+        </member>
+        <member name="P:TinMan.Angle.Tan">
+            <summary>Gets the tangent of this angle.</summary>
+        </member>
+        <member name="P:TinMan.Angle.IsNaN">
+            <summary>
+            Gets a value indicating whether this angle's value is <see cref="F:System.Double.NaN"/>
+            in both radians and degrees.
+            </summary>
+        </member>
+        <member name="P:TinMan.Angle.Abs">
+            <summary>
+            Gets the absolute value.  If this angle is negative, it returns the value
+            multiplied by negative one.
+            </summary>
+        </member>
+        <member name="T:TinMan.Wizard">
+            <summary>
+            Facilitates various superpower actions within the simulated universe such as killing agents,
+            throwing the ball around or changing the game play mode.
+            </summary>
+            <remarks>
+            The tools provided by this class are not available for use in competitive matches.  Instead they
+            are inteded for use as part of machine learning or supervisory roles.
+            </remarks>
+        </member>
+        <member name="F:TinMan.Wizard.DefaultTcpPort">
+            <summary>The default port exposed by the server for monitors, trainers or referees.</summary>
+        </member>
+        <member name="F:TinMan.Wizard.DefaultHostName">
+            <summary>The default host name, <c>localhost</c>.</summary>
+        </member>
+        <member name="M:TinMan.Wizard.#ctor">
+            <summary>Initialises a new wizard for localhost on the default port.</summary>
+        </member>
+        <member name="M:TinMan.Wizard.Run">
+            <summary>
+            Opens a TCP connection to the server at <see cref="P:TinMan.Wizard.HostName"/> on port <see cref="P:TinMan.Wizard.PortNumber"/>
+            and begins processing server messages.
+            <para/>
+            This method must be called before any actions are taken.
+            </summary>
+        </member>
+        <member name="M:TinMan.Wizard.Stop">
+            <summary>
+            Causes the wizard to disconnect from the server and the <see cref="M:TinMan.Wizard.Run"/> method to exit.
+            </summary>
+        </member>
+        <member name="M:TinMan.Wizard.SetAgentPosition(System.Int32,TinMan.FieldSide,TinMan.Vector3)">
+            <summary>Moves the specified agent to a given field position.</summary>
+            <remarks>Note that most agent coordinate frames have their origins located within their torsos.  Therefore,
+            the vector specified by <paramref name="newPosition"/> must contain a positive offset in the z-axis, otherwise
+            the agent will be moved so that its feet are beneath the field.
+            <para/>
+            For <see cref="T:TinMan.NaoBody"/>, a sensible z-offset is 0.45.
+            </remarks>
+            <param name="uniformNumber">The uniform number of the target agent.</param>
+            <param name="teamSide">The side of the field which the target agent's team is defending.</param>
+            <param name="newPosition">The position in field coordinates to which the origin of the agent's frame will be moved.
+            Note that the agent may be positioned above or below the field surface, so be careful to use a sensible Z value.</param>
+        </member>
+        <member name="M:TinMan.Wizard.SetAgentPositionAndDirection(System.Int32,TinMan.FieldSide,TinMan.Vector3,TinMan.Angle)">
+            <summary>Moves the specified agent to a given field position, facing in the given direction.</summary>
+            <remarks>Note that most agent coordinate frames have their origins located within their torsos.  Therefore,
+            the vector specified by <paramref name="newPosition"/> must contain a positive offset in the z-axis, otherwise
+            the agent will be moved so that its feet are beneath the field.
+            <para/>
+            For <see cref="T:TinMan.NaoBody"/>, a sensible z-offset is 0.45.
+            </remarks>
+            <param name="uniformNumber">The uniform number of the target agent.</param>
+            <param name="teamSide">The side of the field which the target agent's team is defending.</param>
+            <param name="newPosition">The position in field coordinates to which the origin of the agent's frame will be moved.
+            Note that the agent may be positioned above or below the field surface, so be careful to use a sensible Z value.</param>
+            <param name="newDirection"></param>
+        </member>
+        <member name="M:TinMan.Wizard.SetBatteryLevel(System.Int32,TinMan.FieldSide,System.Double)">
+            <summary>Overrides the battery level for the specified agent.</summary>
+            <param name="uniformNumber">The uniform number of the target agent.</param>
+            <param name="teamSide">The side of the field which the target agent's team is defending.</param>
+            <param name="batteryLevel"></param>
+        </member>
+        <member name="M:TinMan.Wizard.SetTemperature(System.Int32,TinMan.FieldSide,System.Double)">
+            <summary>Overrides the temperature for the specified agent.</summary>
+            <param name="uniformNumber">The uniform number of the target agent.</param>
+            <param name="teamSide">The side of the field which the target agent's team is defending.</param>
+            <param name="temperature"></param>
+        </member>
+        <member name="M:TinMan.Wizard.SetBallPosition(TinMan.Vector3)">
+            <summary>Repositions the ball at the specified position.
+            Set <paramref name="newPosition"/>'s <see cref="P:TinMan.Vector3.Z"/> value to
+            <see cref="P:TinMan.Measures.BallRadiusMetres"/> to position the ball on the ground.</summary>
+            <param name="newPosition"></param>
+        </member>
+        <member name="M:TinMan.Wizard.SetBallPositionAndVelocity(TinMan.Vector3,TinMan.Vector3)">
+            <summary>Repositions the ball and provides it with a particular velocity.
+            Set <paramref name="newPosition"/>'s <see cref="P:TinMan.Vector3.Z"/> value to
+            <see cref="P:TinMan.Measures.BallRadiusMetres"/> to position the ball on the ground.</summary>
+            <param name="newPosition"></param>
+            <param name="newVelocity"></param>
+        </member>
+        <member name="M:TinMan.Wizard.SetBallVelocity(TinMan.Vector3)">
+            <summary>Sets the velocity of the ball, without altering its position.</summary>
+            <param name="newVelocity"></param>
+        </member>
+        <member name="M:TinMan.Wizard.SetPlayMode(TinMan.PlayMode)">
+            <summary>Sets the play mode of the game in progress.</summary>
+            <param name="playMode"></param>
+        </member>
+        <member name="M:TinMan.Wizard.DropBall">
+            <summary>
+            Drops the ball at its current position and move all players away by the free kick radius.
+            If the ball is off the field, it is brought back within bounds.
+            </summary>
+        </member>
+        <member name="M:TinMan.Wizard.KickOff(TinMan.FieldSide)">
+            <summary>Kicks off the game for either side.</summary>
+            <param name="team"></param>
+        </member>
+        <member name="M:TinMan.Wizard.SelectAgent(System.Int32,TinMan.FieldSide)">
+            <summary>
+            Selects the specified agent.  Only some of the wizard's operations apply to the selected agent.
+            </summary>
+            <param name="uniformNumber">The uniform number of the target agent.</param>
+            <param name="teamSide">The side of the field which the target agent's team is defending.</param>
+        </member>
+        <member name="M:TinMan.Wizard.KillAgent(System.Int32,TinMan.FieldSide)">
+            <summary>Removes the specified agent from the simulation.</summary>
+            <param name="uniformNumber">The uniform number of the target agent.</param>
+            <param name="teamSide">The side of the field which the target agent's team is defending.</param>
+        </member>
+        <member name="M:TinMan.Wizard.KillSelectedAgent">
+            <summary>Removes the agent previously selected via <see cref="M:TinMan.Wizard.SelectAgent(System.Int32,TinMan.FieldSide)"/> from the simulation.</summary>
+        </member>
+        <member name="M:TinMan.Wizard.RepositionAgent(System.Int32,TinMan.FieldSide)">
+            <summary>Repositions the specified agent according to the server's rules.</summary>
+            <param name="uniformNumber">The uniform number of the target agent.</param>
+            <param name="teamSide">The side of the field which the target agent's team is defending.</param>
+        </member>
+        <member name="M:TinMan.Wizard.RepositionSelectedAgent">
+            <summary>Repositions the agent previously selected via <see cref="M:TinMan.Wizard.SelectAgent(System.Int32,TinMan.FieldSide)"/> according
+            to the server's rules.</summary>
+        </member>
+        <member name="M:TinMan.Wizard.KillSimulator">
+            <summary>
+            Kills the simulation server process.  This method would be of more use to a monitor or test
+            harness than to an agent, generally.
+            </summary>
+        </member>
+        <member name="E:TinMan.Wizard.BallTransformUpdated">
+            <summary>
+            Fires whenever the ball position is updated.  The accompanying time is the game time, and will
+            be <see cref="F:System.TimeSpan.Zero"/> the first time this event fires (as the data is unavailable on
+            the first read).
+            </summary>
+        </member>
+        <member name="E:TinMan.Wizard.AgentTransformUpdated">
+            <summary>
+            Fires whenever an agent's position is updated.  The accompanying time is the game time, and will
+            be <see cref="F:System.TimeSpan.Zero"/> the first time this event fires (as the data is unavailable on
+            the first read).
+            </summary>
+        </member>
+        <member name="P:TinMan.Wizard.HostName">
+            <summary>
+            The name of the host running the server to connect to.  By default this is <tt>localhost</tt>.
+            </summary>
+        </member>
+        <member name="P:TinMan.Wizard.PortNumber">
+            <summary>
+            The TCP port number that the server is listening on.  By default this is 3200.
+            </summary>
+        </member>
+        <member name="T:TinMan.Landmark">
+            <summary>
+            Enumeration of fixed landmarks around the field that may be observed by an agent's
+            vision perceptor.
+            </summary>
+        </member>
+        <member name="F:TinMan.Landmark.FlagLeftTop">
+            <summary>The north-west flag.  Referred to as FL1 by the server.</summary>
+        </member>
+        <member name="F:TinMan.Landmark.FlagLeftBottom">
+            <summary>The south-west flag.  Referred to as FL2 by the server.</summary>
+        </member>
+        <member name="F:TinMan.Landmark.FlagRightTop">
+            <summary>The north-east flag.  Referred to as FR1 by the server.</summary>
+        </member>
+        <member name="F:TinMan.Landmark.FlagRightBottom">
+            <summary>The south-east flag.  Referred to as FR2 by the server.</summary>
+        </member>
+        <member name="F:TinMan.Landmark.GoalLeftTop">
+            <summary>The north-west goal.  Referred to as GL1 by the server.</summary>
+        </member>
+        <member name="F:TinMan.Landmark.GoalLeftBottom">
+            <summary>The south-west goal.  Referred to as GL2 by the server.</summary>
+        </member>
+        <member name="F:TinMan.Landmark.GoalRightTop">
+            <summary>The north-east goal.  Referred to as GR1 by the server.</summary>
+        </member>
+        <member name="F:TinMan.Landmark.GoalRightBottom">
+            <summary>The south-east goal.  Referred to as GR2 by the server.</summary>
+        </member>
+        <member name="T:TinMan.VisibleLine">
+            <summary>Represents information about the orientation of observed field lines.</summary>
+        </member>
+        <member name="M:TinMan.VisibleLine.#ctor(TinMan.Polar,TinMan.Polar)">
+            <remarks>
+            Most users will not need to use this constructor as this type is only for inbound messages.
+            This constructor is public to allow for unit testing.
+            </remarks>
+        </member>
+        <member name="P:TinMan.VisibleLine.End1">
+            <summary>Gets an end of the observed line.</summary>
+        </member>
+        <member name="P:TinMan.VisibleLine.End2">
+            <summary>Gets an end of the observed line.</summary>
+        </member>
+        <member name="T:TinMan.FieldSide">
+            <summary>
+            Enumeration of field sides.
+            </summary>
+        </member>
+        <member name="F:TinMan.FieldSide.Unknown">
+            <summary>The side of the field is unknown.</summary>
+        </member>
+        <member name="F:TinMan.FieldSide.Left">
+            <summary>The left side of the field, having a yellow goal.</summary>
+        </member>
+        <member name="F:TinMan.FieldSide.Right">
+            <summary>The right side of the field, having a blue goal.</summary>
+        </member>
+        <member name="T:TinMan.AgentBase`1">
+            <summary>
+            A base class for agents in the TinMan framework.  Use instances of subclasses of this type in
+            conjunction with an <see cref="T:TinMan.AgentHost"/> to execute your agent within the simulation.
+            </summary>
+        </member>
+        <member name="T:TinMan.IAgent">
+            <summary>
+            Interface for all TinMan agents.  Most users should derive directly from <see cref="T:TinMan.AgentBase`1"/>
+            for simplicity.  If you must derive from another class, or wish to mock your agent, you can use
+            this interface.
+            </summary>
+        </member>
+        <member name="M:TinMan.IAgent.OnInitialise">
+            <summary>
+            Performs any initialisation required by the agent prior to the first call to <see cref="M:TinMan.IAgent.Think(TinMan.PerceptorState)"/>.
+            Called by the TinMan framework.
+            </summary>
+        </member>
+        <member name="M:TinMan.IAgent.Think(TinMan.PerceptorState)">
+            <summary>
+            Gives the agent a chance to process the latest body state and perform any necessary actions.
+            </summary>
+            <param name="state"></param>
+            <remarks>Implementations should raise <see cref="E:TinMan.IAgent.ThinkCompleted"/> after thinking so that external components
+            that track the agent's life cycle are notified.</remarks>
+        </member>
+        <member name="M:TinMan.IAgent.OnShuttingDown">
+            <summary>
+            Called when the agent is about to shut down.  At this point, no further messages will be sent to the server.
+            </summary>
+            <remarks>Implementations should raise <see cref="E:TinMan.IAgent.ShuttingDown"/> so that external components that track the
+            agent's life cycle are notified.</remarks>
+        </member>
+        <member name="E:TinMan.IAgent.ThinkCompleted">
+            <summary>
+            Raised when <see cref="M:TinMan.IAgent.Think(TinMan.PerceptorState)"/> finishes.  Add on components may use this event to hook into
+            the agent's process cycle.
+            </summary>
+        </member>
+        <member name="E:TinMan.IAgent.ShuttingDown">
+            <summary>
+            Raised when the agent is shutting down due to a call to <see cref="M:TinMan.IAgent.OnShuttingDown"/>.  Add on components
+            may use this event to hook into the agent's process cycle.
+            </summary>
+        </member>
+        <member name="P:TinMan.IAgent.Body">
+            <summary>Gets the agent's body.</summary>
+            <remarks>Must not be <c>null</c>.</remarks>
+        </member>
+        <member name="P:TinMan.IAgent.IsAlive">
+            <summary>Gets whether the agent should remain connected to the server and processing state.</summary>
+        </member>
+        <member name="P:TinMan.IAgent.Context">
+            <summary>
+            Gets and sets the simulation context for this agent.  The setter is intended only for use by the TinMan
+            framework.  This value is unavailable before the first call to <see cref="M:TinMan.IAgent.OnInitialise"/>.  Attempting to
+            access it before that time will result in an exception.
+            </summary>
+        </member>
+        <member name="M:TinMan.AgentBase`1.#ctor(`0)">
+            <summary>
+            Initialises AgentBase with a body instance.
+            </summary>
+            <param name="body"></param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="body"/> is null.</exception>
+        </member>
+        <member name="M:TinMan.AgentBase`1.OnInitialise">
+            <summary>
+            Performs any initialisation required by the agent prior to the first call to <see cref="M:TinMan.IAgent.Think(TinMan.PerceptorState)"/>.
+            Called by the TinMan framework.  You are not required to override this method.
+            </summary>
+        </member>
+        <member name="M:TinMan.AgentBase`1.Think(TinMan.PerceptorState)">
+            <summary>
+            Gives the agent a chance to process the latest body state and perform any necessary actions.
+            </summary>
+            <param name="state">The latest snapshot of the agent's state.</param>
+        </member>
+        <member name="M:TinMan.AgentBase`1.OnShutDown">
+            <summary>
+            Performs any final action required by the agent as the run loop exits.
+            Called by the TinMan framework.  You are not required to override this method.
+            </summary>
+        </member>
+        <member name="M:TinMan.AgentBase`1.StopSimulation">
+            <summary>
+            Requests that the <see cref="T:TinMan.AgentHost"/> exit the run loop at the completion of this cycle.
+            This action cannot be undone.
+            </summary>
+        </member>
+        <member name="P:TinMan.AgentBase`1.Body">
+            <summary>Gets the agent's body.</summary>
+            <remarks>Will not be <c>null</c>.</remarks>
+        </member>
+        <member name="P:TinMan.AgentBase`1.Measures">
+            <summary>Gets a collection of measurements from the field.  This property returns the same
+            object as <see cref="P:TinMan.ISimulationContext.Measures"/> and is provided for convenience.</summary>
+        </member>
+        <member name="P:TinMan.AgentBase`1.TinMan#IAgent#Body">
+            <summary>Gets the agent's body.</summary>
+            <remarks>
+            Exposes the body as an <see cref="T:TinMan.IBody"/> as required by the base interface.  This property
+            is an explicit interface implementation, meaning it's hidden on an instance unless it's declared
+            as the interface.  The alternative property provides strongly typed access which is more convenient.
+            </remarks>
+        </member>
+        <member name="P:TinMan.AgentBase`1.TinMan#IAgent#Context">
+            <summary>
+            Gets and sets the simulation context for this agent.  The setter is intended only for use by the TinMan
+            framework, and is populated by <see cref="M:TinMan.AgentHost.Run(TinMan.IAgent)"/>.  This value is unavailable before the first
+            call to <see cref="M:TinMan.IAgent.Think(TinMan.PerceptorState)"/>.  Attempting to access it before that time will result in an
+            <see cref="T:System.InvalidOperationException"/>.
+            </summary>
+            <remarks>
+            This is an explicit interface implementation so that the setter is hidden from subclasses in order to
+            avoid confusion.
+            </remarks>
+        </member>
+        <member name="P:TinMan.AgentBase`1.Context">
+            <summary>
+            Gets the <see cref="T:TinMan.ISimulationContext"/> for this agent.  This value is unavailable before the first call to
+            <see cref="M:TinMan.IAgent.Think(TinMan.PerceptorState)"/>.  Attempting to access it before that time will result in an
+            <see cref="T:System.InvalidOperationException"/>.
+            </summary>
+        </member>
+        <member name="P:TinMan.AgentBase`1.IsAlive">
+            <summary>Gets whether the agent should remain connected to the server and processing state.</summary>
+        </member>
+        <member name="P:TinMan.AgentBase`1.Log">
+            <summary>Gets a logger used by the agent.</summary>
+        </member>
+        <member name="T:TinMan.TransformationMatrix">
+            <summary>
+            Represents a 4x4 matrix used to transform <see cref="T:TinMan.Vector3"/> instances.
+            This type is immutable.
+            </summary>
+        </member>
+        <member name="M:TinMan.TransformationMatrix.GetTransformForCoordinateAxes(TinMan.Vector3,TinMan.Vector3,TinMan.Vector3)">
+            <summary>
+            Gets a transformation matrix to transform to the coordinate system specified by the provided
+            axes.
+            </summary>
+            <param name="xAxis"></param>
+            <param name="yAxis"></param>
+            <param name="zAxis"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.TransformationMatrix.#ctor(System.Double[])">
+            <summary>
+            Initialises a new transformation matrix from an array of 16 double values.
+            Note that the array is specified in column-major order:
+            <code>
+            [00, 01, 02, 03,
+             04, 05, 06, 07,
+             08, 09, 10, 11,
+             12, 13, 14, 15]
+            </code>
+            </summary>
+            <remarks>Note that the array passed into this method is copied so may be
+            modified safely once this method returns without effecting this
+            transformation matrix.</remarks>
+            <param name="values"></param>
+        </member>
+        <member name="M:TinMan.TransformationMatrix.Translate(System.Double,System.Double,System.Double)">
+            <summary>
+            Returns a transformation matrix which is the equivalent of this instance, only
+            translated by the specified amount.
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+            <param name="z"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.TransformationMatrix.RotateX(TinMan.Angle)">
+            <summary>
+            Returns a transformation matrix which is the equivalent of this instance, only
+            rotated by the specified amount around the X axis.
+            </summary>
+            <param name="angle"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.TransformationMatrix.RotateY(TinMan.Angle)">
+            <summary>
+            Returns a transformation matrix which is the equivalent of this instance, only
+            rotated by the specified amount around the Y axis.
+            </summary>
+            <param name="angle"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.TransformationMatrix.RotateZ(TinMan.Angle)">
+            <summary>
+            Returns a transformation matrix which is the equivalent of this instance, only
+            rotated by the specified amount around the Z axis.
+            </summary>
+            <param name="angle"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.TransformationMatrix.Multiply(TinMan.TransformationMatrix)">
+            <summary>
+            Returns a transformation matrix which is the product of this instance with the
+            specified matrix.
+            </summary>
+            <param name="matrix"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.TransformationMatrix.Transform(TinMan.Vector3)">
+            <summary>
+            Applies the transformations modelled within this matrix to the specified vector, returning a new, transformed vector.
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.TransformationMatrix.GetXAxis">
+            <summary>Get the direction of the x-axis of this transformation.</summary>
+        </member>
+        <member name="M:TinMan.TransformationMatrix.GetYAxis">
+            <summary>Get the direction of the y-axis of this transformation.</summary>
+        </member>
+        <member name="M:TinMan.TransformationMatrix.GetZAxis">
+            <summary>Get the direction of the z-axis of this transformation.</summary>
+        </member>
+        <member name="M:TinMan.TransformationMatrix.GetTranslation">
+            <summary>Get the translation part of this transformation.</summary>
+        </member>
+        <member name="M:TinMan.TransformationMatrix.GetDeterminant">
+            <summary>
+            Computes the determinant of this matrix.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:TinMan.TransformationMatrix.Identity">
+            <summary>The identity matrix.</summary>
+            <remarks>
+            <pre>
+            [1 0 0 0]
+            [0 1 0 0]
+            [0 0 1 0]
+            [0 0 0 1]
+            </pre>
+            </remarks>
+        </member>
+        <member name="P:TinMan.TransformationMatrix.NaN">
+            <summary>
+            A transformation matrix in which all 16 values are <see cref="F:System.Double.NaN"/>.
+            </summary>
+        </member>
+        <member name="T:TinMan.IEffectorCommand">
+            <summary>
+            Defines the interface that all effector commands sent to the server from an agent implement.
+            </summary>
+        </member>
+        <member name="M:TinMan.IEffectorCommand.AppendSExpression(System.Text.StringBuilder)">
+            <summary>
+            Appends the an SExpression that represents this effector command to <paramref name="s" />.
+            </summary>
+            <param name="s">The string builder in which output messages are accumulating, and to which
+            this effector command's SExpression must be appended.</param>
+        </member>
+        <member name="T:TinMan.HingeSpeedCommand">
+            <summary>
+            Commands a HingeJointEffector to set the speed of rotation to a new value.
+            </summary>
+            <remarks>
+            Format:  ({name} {ax})<br/>
+            Example: (lae3 5.3)
+            </remarks>
+        </member>
+        <member name="T:TinMan.BeamCommand">
+            <summary>
+            Allows a player to position itself on the field before the game starts.
+            </summary>
+            <remarks>
+            Format:  (beam {x} {y} {rot})<br/>
+            Example: (beam 10.0 -10.0 0.0)
+            </remarks>
+        </member>
+        <member name="T:TinMan.SceneSpecificationCommand">
+            <summary>
+            
+            </summary>
+            <remarks>
+            Format:  (scene {filename})<br/>
+            Message: (scene rsg/agent/nao/nao.rsg)
+            </remarks>
+        </member>
+        <member name="T:TinMan.InitialisePlayerCommand">
+            <summary>
+            This command must be sent once for player after <see cref="T:TinMan.SceneSpecificationCommand"/>.
+            It registers this agent as a member of the specified team with the specified uniform number.
+            All players of a team must use the same team name and different numbers. Sending a uniform number
+            of 0 assigns the next free number automatically.
+            Note that the side on which a team starts to play depends on which team connected first.
+            </summary>
+            <remarks>
+            Format:  (init (unum {playernumber})(teamname {yourteamname}))<br/>
+            Example: (init (unum 1)(teamname FHO))
+            </remarks>
+        </member>
+        <member name="M:TinMan.InitialisePlayerCommand.#ctor(System.Int32,System.String)">
+            <summary>
+            </summary>
+            <remarks>
+            If an agent sends 0 as uniformNumber, the number is assigned automatically by the server to the next free number.
+            </remarks>
+            <param name="uniformNumber"></param>
+            <param name="teamName"></param>
+        </member>
+        <member name="T:TinMan.SayCommand">
+            <summary>
+            The say effector permits communication among agents by broadcasting messages.
+            </summary>
+            <remarks>
+            Format:  (say {message})<br/>
+            Example: (say ``helloworld'')
+            </remarks>
+        </member>
+        <member name="T:TinMan.Message">
+            <summary>
+            Represents a validated message according to the rules specified by the server on what strings
+            are allowed to be sent between agents on the field.
+            </summary>
+            <remarks>
+            This type is immutable.
+            </remarks>
+        </member>
+        <member name="M:TinMan.Message.IsValid(System.String)">
+            <summary>
+            Message may consist of 20 characters, which may be taken from the ASCII printing character
+            subset [0x20; 0x7E] except the white space character ' ' and the normal brackets '(' and ')'.
+            </summary>
+        </member>
+        <member name="M:TinMan.Message.#ctor(System.String)">
+            <summary>
+            Initialises a new instance of <see cref="T:TinMan.Message"/> with the value of <paramref name="messageString"/>.
+            </summary>
+            <param name="messageString">The string with which to initialise this <see cref="T:TinMan.Message"/>.</param>
+            <exception cref="T:System.ArgumentException">If <paramref name="messageString"/> is an invalid string
+            according to <see cref="M:TinMan.Message.IsValid(System.String)"/>.</exception>
+        </member>
+        <member name="P:TinMan.Message.Text">
+            <summary>
+            Gets the string representation of this message.
+            </summary>
+        </member>
+        <member name="T:TinMan.GyroState">
+            <summary>Represents the state of a simulated gyro.</summary>
+        </member>
+        <member name="M:TinMan.GyroState.#ctor(System.String,System.Double,System.Double,System.Double)">
+            <remarks>
+            Most users will not need to use this constructor as this type is only for inbound messages.
+            This constructor is public to allow for unit testing.
+            </remarks>
+        </member>
+        <member name="P:TinMan.GyroState.Label">
+            <summary>Gets the label that identifies the gyro.</summary>
+        </member>
+        <member name="P:TinMan.GyroState.XOrientation">
+            <summary>Gets the rotation in the X axis reported by the gyro.</summary>
+        </member>
+        <member name="P:TinMan.GyroState.YOrientation">
+            <summary>Gets the rotation in the Y axis reported by the gyro.</summary>
+        </member>
+        <member name="P:TinMan.GyroState.ZOrientation">
+            <summary>Gets the rotation in the Z axis reported by the gyro.</summary>
+        </member>
+        <member name="M:TinMan.RoboViz.ShapeSet.Translate(TinMan.Vector3)">
+            <summary>Translates any contained Shapes and/or nested ShapeSets by the specified offset.</summary>
+            <param name="offset"></param>
+        </member>
+        <member name="T:TinMan.HeardMessage">
+            <summary>
+            Represents a heard message by an agent on the field.  Models both the contents of the message
+            along with the time it was heard and from what direction.  Note that an agent may here
+            their own message, so check <see cref="P:TinMan.HeardMessage.IsFromSelf"/>.
+            </summary>
+        </member>
+        <member name="M:TinMan.HeardMessage.#ctor(System.TimeSpan,TinMan.Angle,TinMan.Message)">
+            <summary>
+            Initialises a heard message.
+            </summary>
+            <remarks>
+            Most users will not need to use this constructor as this type is only for inbound messages.
+            To send a message, use <see cref="M:TinMan.ISimulationContext.Say(System.String)"/>.
+            This constructor is public to allow for unit testing.
+            </remarks>
+        </member>
+        <member name="P:TinMan.HeardMessage.IsFromSelf">
+            <summary>
+            Gets a value indicating whether the agent heard their own message.
+            </summary>
+        </member>
+        <member name="P:TinMan.HeardMessage.HeardAtTime">
+            <summary>
+            The time at which the message was heard.  This value is relative to <see cref="P:TinMan.PerceptorState.GameTime"/>,
+            <see cref="P:TinMan.PerceptorState.SimulationTime"/>.
+            </summary>
+        </member>
+        <member name="P:TinMan.HeardMessage.RelativeDirection">
+            <summary>
+            Gets the relative direction from which this message was heard.  Note that this direction is only in one axis.
+            TODO determine and document whether this direction is relative to the agent's head, body or field
+            </summary>
+        </member>
+        <member name="P:TinMan.HeardMessage.Text">
+            <summary>
+            Gets the message text.  See <see cref="T:TinMan.Message"/> for more information about messages and their text.
+            </summary>
+        </member>
+        <member name="T:TinMan.ISimulationContext">
+            <summary>
+            Provides a set of actions and data to an agent.
+            </summary>
+        </member>
+        <member name="M:TinMan.ISimulationContext.Say(System.String)">
+            <summary>
+            Causes the agent to speak a message out loud such that nearby agents can hear it.
+            This is the only method of inter-agent communication allowed in RoboCup.
+            </summary>
+            <param name="messageToSay">The string message to say across the field to other
+            agents.  This string must be valid according to <see cref="M:TinMan.Message.IsValid(System.String)"/>.</param>
+        </member>
+        <member name="M:TinMan.ISimulationContext.Beam(System.Double,System.Double,TinMan.Angle)">
+            <summary>
+            Beams the agent to a given location on the field.  The agent's orientation is also specified.
+            Values are in field coordinates, such that (0,0) is the centre of the field.
+            </summary>
+            <param name="x">The target x-position of the agent.</param>
+            <param name="y">The target y-position of the agent.</param>
+            <param name="rotation">Defines the rotation angle of the player. Zero degrees points to positive x axis (to
+            the right of the field), 90 degrees to positive y axis (to the top of the field).</param>
+        </member>
+        <member name="P:TinMan.ISimulationContext.TeamName">
+            <summary>Gets the name assigned to this team.</summary>
+        </member>
+        <member name="P:TinMan.ISimulationContext.Wizard">
+            <summary>Gets and sets an optional wizard for this simulation.  May be <c>null</c>.</summary>
+        </member>
+        <member name="P:TinMan.ISimulationContext.TeamSide">
+            <summary>Gets the side of the playing field that this agent's team has been assigned to.</summary>
+        </member>
+        <member name="P:TinMan.ISimulationContext.UniformNumber">
+            <summary>
+            Gets the uniform number assigned to this agent.  If no number has been assigned yet,
+            this value may be <c>null</c>.
+            </summary>
+        </member>
+        <member name="P:TinMan.ISimulationContext.Measures">
+            <summary>Gets a collection of measurements from the field.</summary>
+        </member>
+        <member name="T:TinMan.ForceState">
+            <summary>Represents the state of a simulated force resistance perceptor.</summary>
+        </member>
+        <member name="M:TinMan.ForceState.#ctor(System.String,TinMan.Vector3,TinMan.Vector3)">
+            <remarks>
+            Most users will not need to use this constructor as this type is only for inbound messages.
+            This constructor is public to allow for unit testing.
+            </remarks>
+        </member>
+        <member name="P:TinMan.ForceState.Label">
+            <summary>Gets the label that identifies the force resistance perceptor.</summary>
+        </member>
+        <member name="T:TinMan.Vector3">
+            <summary>
+            Represents a 3-dimensional vector using double-precision values for all three dimensions.
+            </summary>
+        </member>
+        <member name="F:TinMan.Vector3.Origin">
+            <summary>A constant Vector3 of zero, equivalent to the origin or cartesian coordinates.</summary>
+        </member>
+        <member name="F:TinMan.Vector3.NaN">
+            <summary>A constant Vector3 with a NaN value in all dimensions.</summary>
+        </member>
+        <member name="F:TinMan.Vector3.UnitX">
+            <summary>A constant Vector3 with unit length that points along the X axis.</summary>
+        </member>
+        <member name="F:TinMan.Vector3.UnitY">
+            <summary>A constant Vector3 with unit length that points along the Y axis.</summary>
+        </member>
+        <member name="F:TinMan.Vector3.UnitZ">
+            <summary>A constant Vector3 with unit length that points along the Z axis.</summary>
+        </member>
+        <member name="M:TinMan.Vector3.GetCrossProduct(TinMan.Vector3,TinMan.Vector3)">
+            <summary>
+            Returns a vector which is perpendicular to both <paramref name="a"/> and <paramref name="b" /> and the plane containing them.
+            If either of these vectors are zero, or they are parallel, then their cross product is zero.
+            The magnitude of the product equals the area of a parallelogram with the vectors for sides.
+            Cross products are anticommutative, meaning <tt>A x B == -(B x A)</tt>.
+            </summary>
+            <param name="a"></param>
+            <param name="b"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.Vector3.#ctor(System.Double,System.Double,System.Double)">
+            <summary>
+            Initialises a new 3D vector with the specified values.
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+            <param name="z"></param>
+        </member>
+        <member name="M:TinMan.Vector3.Normalize">
+            <summary>
+            Returns a vector that has the same direction as this one, but with a length of one (a unit vector).
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.Vector3.Cross(TinMan.Vector3)">
+            <summary>
+            Gets the 3D vector that is the result of crossing this vector with the specified one.
+            </summary>
+            <param name="vector"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.Vector3.WithX(System.Double)">
+            <summary>
+            Returns a copy of this <see cref="T:TinMan.Vector3"/> with its <see cref="P:TinMan.Vector3.X"/> property set
+            to <paramref name="newX"/>.
+            </summary>
+            <param name="newX">The <see cref="P:TinMan.Vector3.X"/> value to use.</param>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.Vector3.WithY(System.Double)">
+            <summary>
+            Returns a copy of this <see cref="T:TinMan.Vector3"/> with its <see cref="P:TinMan.Vector3.Y"/> property set
+            to <paramref name="newY"/>.
+            </summary>
+            <param name="newY">The <see cref="P:TinMan.Vector3.Y"/> value to use.</param>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.Vector3.WithZ(System.Double)">
+            <summary>
+            Returns a copy of this <see cref="T:TinMan.Vector3"/> with its <see cref="P:TinMan.Vector3.Z"/> property set
+            to <paramref name="newZ"/>.
+            </summary>
+            <param name="newZ">The <see cref="P:TinMan.Vector3.Z"/> value to use.</param>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.Vector3.Abs">
+            <summary>
+            Returns a copy of this vector having absolute values of each component.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.Vector3.AngleTo(TinMan.Vector3)">
+            <summary>
+            Returns the angle between this vector and <paramref name="v"/>.
+            The return value is constrained to the radian range [0,PI].
+            </summary>
+            <param name="v">Vector to measure the angle against.</param>
+            <returns>The angle in the radian range [0,PI].</returns>
+        </member>
+        <member name="P:TinMan.Vector3.X">
+            <summary>Gets the X component of this 3D vector.</summary>
+        </member>
+        <member name="P:TinMan.Vector3.Y">
+            <summary>Gets the Y component of this 3D vector.</summary>
+        </member>
+        <member name="P:TinMan.Vector3.Z">
+            <summary>Gets the Z component of this 3D vector.</summary>
+        </member>
+        <member name="P:TinMan.Vector3.IsZero">
+            <summary>
+            Gets a value indicating whether X, Y and Z are all equal to zero (i.e. the origin).
+            </summary>
+        </member>
+        <member name="P:TinMan.Vector3.IsNaN">
+            <summary>
+            Gets a value indicating whether X, Y and Z are all equal to <see cref="F:System.Double.NaN"/>.
+            </summary>
+        </member>
+        <member name="P:TinMan.Vector3.Length">
+            <summary>Gets the length of this vector.</summary>
+            <remarks>Note that this value is not cached, and so is calculated each time this property is read.</remarks>
+            <returns></returns>
+        </member>
+        <member name="T:TinMan.PlayMode">
+            <summary>
+            Enumeration of all possible modes that a simulated game of soccer can be in.
+            </summary>
+        </member>
+        <member name="F:TinMan.PlayMode.Unknown">
+            <summary>
+            This value is specific to TinMan and won't be returned by the server.
+            TinMan uses it to indicate that no value has been received from the server.
+            </summary>
+        </member>
+        <member name="F:TinMan.PlayMode.BeforeKickOff">
+            <summary>Before the match.</summary>
+        </member>
+        <member name="F:TinMan.PlayMode.KickOffLeft">
+            <summary>Kick off for the left team.</summary>
+        </member>
+        <member name="F:TinMan.PlayMode.KickOffRight">
+            <summary>Kick off for the right team.</summary>
+        </member>
+        <member name="F:TinMan.PlayMode.PlayOn">
+            <summary>Regular game play.</summary>
+        </member>
+        <member name="F:TinMan.PlayMode.KickInLeft">
+            <summary></summary>
+        </member>
+        <member name="F:TinMan.PlayMode.KickInRight">
+            <summary></summary>
+        </member>
+        <member name="F:TinMan.PlayMode.CornerKickLeft">
+            <summary>Corner kick left team.</summary>
+        </member>
+        <member name="F:TinMan.PlayMode.CornerKickRight">
+            <summary>Corner kick right team.</summary>
+        </member>
+        <member name="F:TinMan.PlayMode.GoalKickLeft">
+            <summary>Goal kick for left team.</summary>
+        </member>
+        <member name="F:TinMan.PlayMode.GoalKickRIght">
+            <summary>Goal kick for right team.</summary>
+        </member>
+        <member name="F:TinMan.PlayMode.OffsideLeft">
+            <summary>Offside for the left team.</summary>
+        </member>
+        <member name="F:TinMan.PlayMode.OffsideRight">
+            <summary>Offside for the right team.</summary>
+        </member>
+        <member name="F:TinMan.PlayMode.GameOver">
+            <summary></summary>
+        </member>
+        <member name="F:TinMan.PlayMode.GoalLeft">
+            <summary></summary>
+        </member>
+        <member name="F:TinMan.PlayMode.GoalRight">
+            <summary></summary>
+        </member>
+        <member name="F:TinMan.PlayMode.FreeKickLeft">
+            <summary>Free kick for the left team.</summary>
+        </member>
+        <member name="F:TinMan.PlayMode.FreeKickRight">
+            <summary>Free kick for the right team.</summary>
+        </member>
+        <member name="F:TinMan.PlayMode.None">
+            <summary>No play mode exists.</summary>
+        </member>
+        <member name="T:TinMan.PlayModeUtil">
+            <summary>
+            A collection of utility methods for converting server play modes (strings) to TinMan ones (enums).
+            Most users of TinMan won't need to use this type, as TinMan only uses the <see cref="T:TinMan.PlayMode"/> enum
+            in its APIs.
+            </summary>
+        </member>
+        <member name="M:TinMan.PlayModeUtil.TryParse(System.String,TinMan.PlayMode@)">
+            <summary>Gets the enum value for the specified server play mode string.</summary>
+            <param name="modeStr"></param>
+            <param name="playMode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.PlayModeUtil.GetServerString(TinMan.PlayMode)">
+            <summary>Gets the string used by the server for the specified play mode enum value.</summary>
+            <param name="playMode"></param>
+            <returns></returns>
+        </member>
+        <member name="T:TinMan.SimulationContext">
+            <summary>Default implementation of <see cref="T:TinMan.ISimulationContext"/>.</summary>
+            <remarks>Threadsafe.</remarks>
+        </member>
+        <member name="M:TinMan.SimulationContext.Say(System.String)">
+            <summary>
+            Causes the agent to speak a message out loud such that nearby agents can hear it.
+            This is the only method of inter-agent communication allowed in RoboCup.
+            </summary>
+            <param name="messageString"></param>
+        </member>
+        <member name="M:TinMan.SimulationContext.Beam(System.Double,System.Double,TinMan.Angle)">
+            <summary>
+            Beams the agent to a given location on the field.  The agent's orientation is also specified.
+            Values are in field coordinates, such that (0,0) is the centre of the field.
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+            <param name="rotation">Defines the rotation angle of the player. Zero degrees points to positive x axis (to
+            the right of the field), 90 degrees to positive y axis (to the top of the field).</param>
+        </member>
+        <member name="P:TinMan.SimulationContext.Measures">
+            <summary>Gets a collection of measurements from the field.</summary>
+        </member>
+        <member name="P:TinMan.SimulationContext.TeamName">
+            <summary>Gets the name assigned to this team.</summary>
+        </member>
+        <member name="P:TinMan.SimulationContext.TeamSide">
+            <summary>Gets the side of the playing field that this agent's team has been assigned to.</summary>
+        </member>
+        <member name="P:TinMan.SimulationContext.PlayMode">
+            <summary>Gets the current play mode.</summary>
+        </member>
+        <member name="P:TinMan.SimulationContext.UniformNumber">
+            <summary>Gets the uniform number assigned to this agent.  If no number has been assigned yet, this value may be <c>null</c>.</summary>
+        </member>
+        <member name="P:TinMan.SimulationContext.Wizard">
+            <summary>Gets the wizard of this simulation.  May be <c>null</c>.</summary>
+        </member>
+        <member name="T:TinMan.TouchState">
+            <summary>Represents the state of a simulated touch perceptor.</summary>
+        </member>
+        <member name="M:TinMan.TouchState.#ctor(System.String,System.Boolean)">
+            <remarks>
+            Most users will not need to use this constructor as this type is only for inbound messages.
+            This constructor is public to allow for unit testing.
+            </remarks>
+        </member>
+        <member name="P:TinMan.TouchState.Label">
+            <summary>Gets the label that identifies the touch perceptor.</summary>
+        </member>
+        <member name="P:TinMan.TouchState.IsTouching">
+            <summary>Gets a value indicating whether the touch perceptor reports sensing touch or not.</summary>
+        </member>
+        <member name="T:TinMan.PerceptorState">
+            <summary>
+            Models the snapshot of perceptor state sent from the server.  Not all fields will
+            necessarily be populated.
+            </summary>
+        </member>
+        <member name="M:TinMan.PerceptorState.#ctor(System.TimeSpan,System.TimeSpan,TinMan.PlayMode,TinMan.FieldSide,System.Nullable{System.Int32},System.Collections.Generic.IEnumerable{TinMan.GyroState},System.Collections.Generic.IEnumerable{TinMan.HingeState},System.Collections.Generic.IEnumerable{TinMan.UniversalJointState},System.Collections.Generic.IEnumerable{TinMan.TouchState},System.Collections.Generic.IEnumerable{TinMan.ForceState},System.Collections.Generic.IEnumerable{TinMan.AccelerometerState},System.Collections.Generic.IEnumerable{TinMan.LandmarkPosition},System.Collections.Generic.IEnumerable{TinMan.VisibleLine},System.Collections.Generic.IEnumerable{TinMan.PlayerPosition},System.Collections.Generic.IEnumerable{TinMan.PlayerPosition},System.Nullable{TinMan.Polar},System.Nullable{System.Double},System.Nullable{System.Double},System.Collections.Generic.IEnumerable{TinMan.HeardMessage},System.Nullable{TinMan.Vector3})">
+            <remarks>
+            Most users will not need to use this constructor as this type is instantiated by the TinMan framework.
+            This constructor is public to allow for unit testing.
+            </remarks>
+        </member>
+        <member name="M:TinMan.PerceptorState.TryGetHingeAngle(TinMan.Hinge,TinMan.Angle@)">
+            <summary>Looks up the current angle for the given hinge.</summary>
+            <remarks>Note that this method is marked with internal visibility as agent code
+            should not need to use it.  Instead, access <see cref="P:TinMan.Hinge.Angle"/> directly
+            and avoid the O(N) lookup cost.</remarks>
+        </member>
+        <member name="P:TinMan.PerceptorState.SimulationTime">
+            <summary>
+            Gets the simulation time at which this state applies.  Simulation time is distinct from
+            <see cref="P:TinMan.PerceptorState.GameTime"/> in that it is always increasing, even when the game's
+            <see cref="P:TinMan.PerceptorState.PlayMode"/> means a game is not in progress.  The majority of agent hinge
+            movement should be timed via this value.
+            </summary>
+        </member>
+        <member name="P:TinMan.PerceptorState.GameTime">
+            <summary>
+            Gets the length of time into the current game period.  If the <see cref="P:TinMan.PerceptorState.PlayMode"/>
+            means that a game period is not currently in progress, then this value will be static.
+            Note also that this value can jump backwards after the first game period.
+            </summary>
+        </member>
+        <member name="P:TinMan.PerceptorState.PlayMode">
+            <summary>Gets the current state of the soccer game.</summary>
+        </member>
+        <member name="P:TinMan.PerceptorState.TeamSide">
+            <summary>Gets the side of the field upon which the agent's team is currently playing.</summary>
+            <remarks>This value is only sent by the server at startup, hence this property is internal, and its value copied to the public property <see cref="P:TinMan.ISimulationContext.TeamSide"/> when observed.</remarks>
+        </member>
+        <member name="P:TinMan.PerceptorState.UniformNumber">
+            <summary>
+            Gets the uniform number assigned to this agent.  If no number has been assigned yet,
+            this value may be <c>null</c>.
+            </summary>
+        </member>
+        <member name="P:TinMan.PerceptorState.GyroStates">
+            <summary>Gets the state of any gyroscopes in the agent's body.</summary>
+        </member>
+        <member name="P:TinMan.PerceptorState.HingeStates">
+            <summary>Gets the state of any hinges in the agent's body.</summary>
+        </member>
+        <member name="P:TinMan.PerceptorState.UniversalJointStates">
+            <summary>Gets the state of any universtal joints in the agent's body.</summary>
+        </member>
+        <member name="P:TinMan.PerceptorState.TouchStates">
+            <summary>Gets the state of any touch perceptors in the agent's body.</summary>
+        </member>
+        <member name="P:TinMan.PerceptorState.ForceStates">
+            <summary>Gets the state of any force resistance perceptors (FRP) in the agent's body.</summary>
+        </member>
+        <member name="P:TinMan.PerceptorState.AccelerometerStates">
+            <summary>Gets the state of any accelerometers in the agent's body.</summary>
+        </member>
+        <member name="P:TinMan.PerceptorState.LandmarkPositions">
+            <summary>Gets the position of any landmarks seen by the agent's vision perceptor.</summary>
+        </member>
+        <member name="P:TinMan.PerceptorState.VisibleLines">
+            <summary>Gets positional information about all field lines observed by the vision perceptor.</summary>
+        </member>
+        <member name="P:TinMan.PerceptorState.BallPosition">
+            <summary>Gets the position of the ball, if seen by the agent's vision perceptor.</summary>
+        </member>
+        <member name="P:TinMan.PerceptorState.TeamMatePositions">
+            <summary>Gets the position of any team mates, if seen by the agent's vision perceptor.</summary>
+        </member>
+        <member name="P:TinMan.PerceptorState.OppositionPositions">
+            <summary>Gets the position of any opponent players, if seen by the agent's vision perceptor.</summary>
+        </member>
+        <member name="P:TinMan.PerceptorState.AgentBattery">
+            <summary>Gets the agents battery level, if specified for the simulation.</summary>
+        </member>
+        <member name="P:TinMan.PerceptorState.AgentTemperature">
+            <summary>Gets the agents temperature level, if specified for the simulation.</summary>
+        </member>
+        <member name="P:TinMan.PerceptorState.AgentPosition">
+            <summary>
+            Gets the position of the agent on the field in world coordinates via the
+            Vector3's X and Y properties, with the agent's heading in the Z property.
+            Note that this property is only ever populated by the server when a special
+            configuration option is used.  This option is not used in competitions,
+            however it can be useful for training your agent.
+            </summary>
+            <remarks>
+            To enable this value, set <c>(setSenseMyPos true)</c> in
+            <c>rcssserver3d/rsg/agent/nao/naoneckhead.rsg</c>.
+            </remarks>
+        </member>
+        <member name="P:TinMan.PerceptorState.HeardMessages">
+            <summary>Gets any messages heard by the agent.</summary>
+        </member>
+        <member name="T:TinMan.PlayerPosition">
+            <summary>Represents information about the location of a seen player.</summary>
+        </member>
+        <member name="M:TinMan.PlayerPosition.#ctor(System.Boolean,System.Int32,System.Collections.Generic.IEnumerable{TinMan.BodyPartPosition})">
+            <remarks>
+            Most users will not need to use this constructor as this type is only for inbound messages.
+            This constructor is public to allow for unit testing.
+            </remarks>
+        </member>
+        <member name="P:TinMan.PlayerPosition.IsTeamMate">
+            <summary>Gets a value indicating whether the seen player is on the agent's team (a team mate) or not (an opponent.)</summary>
+        </member>
+        <member name="P:TinMan.PlayerPosition.PlayerId">
+            <summary>Gets the ID of the seen player.</summary>
+        </member>
+        <member name="P:TinMan.PlayerPosition.PartPositions">
+            <summary>Gets the positions of body parts of the seen player, in camera coordinates.</summary>
+        </member>
+        <member name="T:TinMan.BodyPartPosition">
+            <summary>
+            Describes the location of an agent's body part relative to an observing agent, as
+            observed by the agent's vision perceptor.
+            </summary>
+        </member>
+        <member name="M:TinMan.BodyPartPosition.#ctor(System.String,TinMan.Polar)">
+            <remarks>
+            Most users will not need to use this constructor as this type is only for inbound messages.
+            This constructor is public to allow for unit testing.
+            </remarks>
+        </member>
+        <member name="P:TinMan.BodyPartPosition.Label">
+            <summary>Gets the label that identifies the body part.</summary>
+        </member>
+        <member name="P:TinMan.BodyPartPosition.PolarPosition">
+            <summary>Gets the position of the seen body part, in camera coordinates.</summary>
+        </member>
+        <member name="P:TinMan.PerceptorParsing.Token.kind">
+            <summary>token kind</summary>
+        </member>
+        <member name="P:TinMan.PerceptorParsing.Token.pos">
+            <summary>token position in the source text (starting at 0)</summary>
+        </member>
+        <member name="P:TinMan.PerceptorParsing.Token.col">
+            <summary>token column (starting at 1)</summary>
+        </member>
+        <member name="P:TinMan.PerceptorParsing.Token.line">
+            <summary>token line (starting at 1)</summary>
+        </member>
+        <member name="P:TinMan.PerceptorParsing.Token.val">
+            <summary>token value</summary>
+        </member>
+        <member name="P:TinMan.PerceptorParsing.Token.next">
+            <summary>ML 2005-03-11 Tokens are kept in linked list</summary>
+        </member>
+        <member name="T:TinMan.AgentHost">
+            <summary>
+            Hosts an implementation of <see cref="T:TinMan.IAgent"/>, handling all communication with the server and
+            managing the lifecycle of the TinMan framework with respect to the simulation.
+            </summary>
+        </member>
+        <member name="F:TinMan.AgentHost.DefaultTcpPort">
+            <summary>
+            The default TCP port number upon upon the <c>rcssserver3d</c> process accepts agent
+            connections.  If the server is hosted on a different port, use the <see cref="P:TinMan.AgentHost.PortNumber"/>
+            property to specify the necessary port number.
+            </summary>
+        </member>
+        <member name="F:TinMan.AgentHost.DefaultHostName">
+            <summary>
+            The default network host name upon which the <c>rcssserver3d</c> process accepts is running.
+            By default this is <c>localhost</c>.  If the server is hosted on a remote machine, use the
+            <see cref="P:TinMan.AgentHost.HostName"/> property to specify the necessary host name.
+            </summary>
+        </member>
+        <member name="F:TinMan.AgentHost.CyclePeriodSeconds">
+            <summary>
+            The period of time between simulation steps.  Agents are given the chance to think
+            and update their effectors in steps of this period.
+            </summary>
+        </member>
+        <member name="F:TinMan.AgentHost.CyclePeriod">
+            <summary>
+            The period of time between simulation steps.  Agents are given the chance to think
+            and update their effectors in steps of this period.
+            </summary>
+        </member>
+        <member name="M:TinMan.AgentHost.#ctor">
+            <summary>
+            Creates a new client.  <see cref="P:TinMan.AgentHost.HostName"/> is set to <tt>localhost</tt> and
+            <see cref="P:TinMan.AgentHost.TeamName"/> to <tt>TinManBots</tt>.  Change these explicitly after
+            construction, but before calling <see cref="M:TinMan.AgentHost.Run(TinMan.IAgent)"/>.
+            </summary>
+        </member>
+        <member name="M:TinMan.AgentHost.Run(TinMan.IAgent)">
+            <summary>
+            Connects to the RoboCup3D server and runs a simulation with <paramref name="agent"/>.
+            This call blocks until either <see cref="M:TinMan.AgentHost.Stop"/> is called, or <see cref="P:TinMan.IAgent.IsAlive"/>
+            becomes false (usually because an agent calls <see cref="M:TinMan.AgentBase`1.StopSimulation"/>.
+            </summary>
+            <param name="agent"></param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="agent"/> is <c>null</c>.</exception>
+            <exception cref="T:System.InvalidOperationException"><see cref="M:TinMan.AgentHost.Run(TinMan.IAgent)"/> has already been called on this agent host.</exception>
+        </member>
+        <member name="M:TinMan.AgentHost.Stop">
+            <summary>
+            Instructs the host to stop running.  After calling this method, the <see cref="M:TinMan.AgentHost.Run(TinMan.IAgent)"/> method will return.
+            </summary>
+        </member>
+        <member name="P:TinMan.AgentHost.TeamName">
+            <summary>Gets and sets the name of the team to which this agent belongs.</summary>
+            <exception cref="T:System.InvalidOperationException"><see cref="M:TinMan.AgentHost.Run(TinMan.IAgent)"/> has already been called on this agent host.</exception>
+            <exception cref="T:System.ArgumentNullException"><param name="value"/> is null.</exception>
+        </member>
+        <member name="P:TinMan.AgentHost.DesiredUniformNumber">
+            <summary>
+            Gets and sets the desired uniform number for this player.  A value of zero tells the server to
+            assign the next available number automatically.  This is the default.
+            </summary>
+            <exception cref="T:System.InvalidOperationException"><see cref="M:TinMan.AgentHost.Run(TinMan.IAgent)"/> has already been called on this agent host.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException"><param name="value"/> is negative.</exception>
+        </member>
+        <member name="P:TinMan.AgentHost.HostName">
+            <summary>
+            The name of the host running the server to connect to.  By default this is <tt>localhost</tt>.
+            </summary>
+            <exception cref="T:System.InvalidOperationException"><see cref="M:TinMan.AgentHost.Run(TinMan.IAgent)"/> has already been called on this agent host.</exception>
+            <exception cref="T:System.ArgumentNullException"><param name="value"/> is null.</exception>
+        </member>
+        <member name="P:TinMan.AgentHost.PortNumber">
+            <summary>
+            The TCP port number that the server is listening on.  By default this is 3100.
+            </summary>
+            <exception cref="T:System.InvalidOperationException"><see cref="M:TinMan.AgentHost.Run(TinMan.IAgent)"/> has already been called on this agent host.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException"><param name="value"/> is zero or less.</exception>
+        </member>
+        <member name="P:TinMan.AgentHost.Context">
+            <summary>
+            Gets the simulation context used by this host.  The context provides appropriately
+            scoped access to resources provided by the TinMan framework for use by an agent.
+            </summary>
+        </member>
+        <member name="T:TinMan.Measures">
+            <summary>
+            Holds information about the dimensions and geometry of the soccer field upon which the
+            robots are playing.
+            </summary>
+            <remarks>
+            <list type="bullet">
+                <item>The dimensions of the soccer field are 21 by 14 meters.</item>
+                <item>The center spot has a radius of 4.5 meters.</item>
+                <item>Each goal is 2.1 by 0.6 meter with a height of 0.8 meters.</item>
+                <item>The soccer field is surrounded by a border of 10 meters in each direction.</item>
+                <item>Space outside this border area is not reachable by an agent.</item>
+                <item>The soccer ball has a radius of 0.04 meters and a mass of 26 grams.</item>
+            </list>
+            <pre>
+                   |--------------- 21 m --------------|
+             
+             (-11.5,-7)
+                   *-----------------+-----------------+            ---
+                   |                 |                 |              |
+                   |                 |                 |              |
+                   |                 |                 |              |
+                  -* (-11.5,-1.05)   |                 +-     ---     |
+                   |                 |                 |        |     |
+              Goal |                 O (0,0)           | Goal  2.1m  14m
+                   |                 |                 |        |     |
+                  -+ (-11.5,1.05)    |                 +-     ---     |
+                   |                 |                 |              |
+                   |                 |                 |              |
+                   |                 |                 |              |
+                   +-----------------+-----------------+            ---
+                                                       (11.5,7)
+            </pre>
+            </remarks>
+        </member>
+        <member name="M:TinMan.Measures.GetLandmarkPointGlobal(TinMan.Landmark)">
+            <summary>Gets the location of a landmark in global coordinates.</summary>
+            <param name="landmark"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.Measures.IsInField(TinMan.Vector3)">
+            <summary>
+            Calculates whether the given point is within the field.  The Z vector component is not considered.
+            </summary>
+            <param name="vector"></param>
+            <returns></returns>
+        </member>
+        <member name="P:TinMan.Measures.BallRadiusMetres">
+            <summary>The radius of the ball in metres.</summary>
+        </member>
+        <member name="P:TinMan.Measures.BallMassKilograms">
+            <summary>The mass of the ball in kilograms.</summary>
+        </member>
+        <member name="P:TinMan.Measures.FieldYLength">
+            <summary>The size of the field across its narrower dimension.</summary>
+        </member>
+        <member name="P:TinMan.Measures.FieldXLength">
+            <summary>The size of the field across its wider dimension, from goal to goal.</summary>
+        </member>
+        <member name="P:TinMan.Measures.FieldXLeft">
+            <summary>The x-coordinate value at the left edge of the field.</summary>
+        </member>
+        <member name="P:TinMan.Measures.FieldXRight">
+            <summary>The x-coordinate value at the right edge of the field.</summary>
+        </member>
+        <member name="P:TinMan.Measures.FieldYTop">
+            <summary>The x-coordinate value at the left edge of the field.</summary>
+        </member>
+        <member name="P:TinMan.Measures.FieldYBottom">
+            <summary>The x-coordinate value at the right edge of the field.</summary>
+        </member>
+        <member name="P:TinMan.Measures.FieldZHeight">
+            <summary>The height above ground level of the simulated area of the field.</summary>
+            <remarks>Note that the agent may not be positioned more than 20 above ground level.</remarks>
+        </member>
+        <member name="P:TinMan.Measures.GoalYLength">
+            <summary>The width of the goal as a player looks at it.</summary>
+        </member>
+        <member name="P:TinMan.Measures.GoalZLength">
+            <summary>The height that the goal extends above the ground.</summary>
+        </member>
+        <member name="P:TinMan.Measures.GoalXLength">
+            <summary>The depth of the goal.  That is, the distance from the opening of the goal on the field's side to the back of the net.</summary>
+        </member>
+        <member name="P:TinMan.Measures.PenaltyAreaXLength">
+            <summary></summary>
+        </member>
+        <member name="P:TinMan.Measures.PenaltyAreaYLength">
+            <summary></summary>
+        </member>
+        <member name="P:TinMan.Measures.FreeKickDistance">
+            <summary></summary>
+        </member>
+        <member name="P:TinMan.Measures.FreeKickMoveDistance">
+            <summary></summary>
+        </member>
+        <member name="P:TinMan.Measures.GoalKickDistance">
+            <summary></summary>
+        </member>
+        <member name="P:TinMan.Measures.FlagLeftTopPosition">
+            <summary>The location, in global coordinates, of the base of the top-left (north-west) flag.</summary>
+        </member>
+        <member name="P:TinMan.Measures.FlagLeftBottomPosition">
+            <summary>The location, in global coordinates, of the base of the bottom-left (south-west) flag.</summary>
+        </member>
+        <member name="P:TinMan.Measures.FlagRightTopPosition">
+            <summary>The location, in global coordinates, of the base of the top-right (north-east) flag.</summary>
+        </member>
+        <member name="P:TinMan.Measures.FlagRightBottomPosition">
+            <summary>The location, in global coordinates, of the base of the bottom-right (south-east) flag.</summary>
+        </member>
+        <member name="P:TinMan.Measures.GoalLeftTopPosition">
+            <summary>The location, in global coordinates, of the top of the top-left (north-west) goal post.</summary>
+        </member>
+        <member name="P:TinMan.Measures.GoalLeftBottomPosition">
+            <summary>The location, in global coordinates, of the top of the bottom-left (south-west) goal post.</summary>
+        </member>
+        <member name="P:TinMan.Measures.GoalRightTopPosition">
+            <summary>The location, in global coordinates, of the top of the top-right (north-east) goal post.</summary>
+        </member>
+        <member name="P:TinMan.Measures.GoalRightBottomPosition">
+            <summary>The location, in global coordinates, of the top of the bottom-right (south-east) goal post.</summary>
+        </member>
+        <member name="T:TinMan.Polar">
+            <summary>
+            Represents a vector in polar coordinates.  This type is immutable.
+            </summary>
+        </member>
+        <member name="F:TinMan.Polar.Zero">
+            <summary>A constant polar value of zero.</summary>
+        </member>
+        <member name="M:TinMan.Polar.#ctor(System.Double,TinMan.Angle,TinMan.Angle)">
+            <summary>
+            
+            </summary>
+            <param name="distance"></param>
+            <param name="theta">Angle in the horizontal plane.  Zero points towards the opponent's goal.</param>
+            <param name="phi">Lattitudinal angle.  Zero means horizontal, negative pointing downwards.</param>
+        </member>
+        <member name="M:TinMan.Polar.ToVector3">
+            <summary>
+            Convert from polar coordinates to cartesian coordinates.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:TinMan.Polar.Distance">
+            <summary>The distance from the origin.</summary>
+        </member>
+        <member name="P:TinMan.Polar.Theta">
+            <summary>
+            The angle in the horizontal plane. For an agent standing upright on the field, increasing values of this property represent
+            polar points moving from left to right.  Zero degrees points straight ahead in that frame of reference.
+            </summary>
+        </member>
+        <member name="P:TinMan.Polar.Phi">
+            <summary>
+            The latitudal angle. For an agent standing upright on the field, increasing values of this property represent polar points
+            moving from below eyeline, upwards toward the sky.  Zero degrees means horizontal.  A negative angle implies the ray is
+            angled downwards from its origin within that frame of reference.
+            </summary>
+        </member>
+        <member name="P:TinMan.Polar.IsZero">
+            <summary>
+            Gets a value indicating whether the distance and both angles are equal to zero.
+            </summary>
+        </member>
+        <member name="T:TinMan.UniversalJointState">
+            <summary>Represents the state of a simulated universal joint.</summary>
+        </member>
+        <member name="M:TinMan.UniversalJointState.#ctor(System.String,TinMan.Angle,TinMan.Angle)">
+            <remarks>
+            Most users will not need to use this constructor as this type is only for inbound messages.
+            This constructor is public to allow for unit testing.
+            </remarks>
+        </member>
+        <member name="P:TinMan.UniversalJointState.Label">
+            <summary>Gets the label that identifies the universal joint.</summary>
+        </member>
+        <member name="P:TinMan.UniversalJointState.Angle1">
+            <summary>Gets the first angle of the universal joint.</summary>
+        </member>
+        <member name="P:TinMan.UniversalJointState.Angle2">
+            <summary>Gets the second angle of the universal joint.</summary>
+        </member>
+        <member name="T:TinMan.LandmarkPosition">
+            <summary>Represents information about the location of a seen landmark, such as a corner flag or a goal post.</summary>
+        </member>
+        <member name="M:TinMan.LandmarkPosition.#ctor(TinMan.Landmark,TinMan.Polar)">
+            <remarks>
+            Most users will not need to use this constructor as this type is only for inbound messages.
+            This constructor is public to allow for unit testing.
+            </remarks>
+        </member>
+        <member name="P:TinMan.LandmarkPosition.Landmark">
+            <summary>Gets the type of landmark that has been seen.</summary>
+        </member>
+        <member name="P:TinMan.LandmarkPosition.PolarPosition">
+            <summary>Gets the polar position of the landmark that has been seen, in camera coordinates.</summary>
+        </member>
+        <member name="T:TinMan.Hinge">
+            <summary>
+            Represents a single hinge joint within an agent's body.
+            </summary>
+        </member>
+        <member name="M:TinMan.Hinge.#ctor(System.String,System.String,TinMan.Angle,TinMan.Angle)">
+            <summary>
+            Creates a new hinge.  Note that most users will not need to create their own hinges, instead using
+            one of the built-in <see cref="T:TinMan.IBody"/> implementations such as <see cref="T:TinMan.NaoBody"/> that come with
+            prepopulated hinges that match the corresponding simulator models.
+            </summary>
+            <remarks>
+            SimSpark models use different labels for the perceptor and effector of each hinge.
+            </remarks>
+            <param name="perceptorLabel">The string label used for the hinge's perceptor.</param>
+            <param name="effectorLabel">The string label used for the hinge's effector.</param>
+            <param name="minAngle">The minimum angle that this hinge may reach.</param>
+            <param name="maxAngle">The maximum angle that this hinge may reach.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="perceptorLabel"/> or
+            <paramref name="effectorLabel"/> are <c>null</c>.</exception>
+            <exception cref="T:System.ArgumentException"><paramref name="maxAngle"/> is less than <paramref name="minAngle"/>.</exception>
+        </member>
+        <member name="M:TinMan.Hinge.SetDesiredSpeedInternal(TinMan.AngularSpeed)">
+            <summary>
+            Sets the desired speed without clearing any control function.  Setting <see cref="P:TinMan.Hinge.DesiredSpeed"/>
+            directly would clear any control function.
+            </summary>
+            <param name="desiredSpeed"></param>
+        </member>
+        <member name="M:TinMan.Hinge.SetControlFunction(System.Func{TinMan.Hinge,TinMan.ISimulationContext,TinMan.PerceptorState,TinMan.AngularSpeed})">
+            <summary>
+            Sets a function that controls the speed of the hinge.  This function is called
+            every cycle of the simulation.  Only one function may be applied to a given joint
+            at a time, and setting a control function when one already exists will replace it.
+            </summary>
+            <remarks>
+            For more information on hinge control functions, see the project wiki.
+            </remarks>
+            <param name="controlFunction">The control function to apply to this hinge.</param>
+        </member>
+        <member name="M:TinMan.Hinge.ClearControlFunction">
+            <summary>
+            Removes any control function from this hinge.
+            </summary>
+            <remarks>
+            Note that this method does not set <see cref="P:TinMan.Hinge.DesiredSpeed"/> to zero, so any prior speed
+            value will remain set on the hinge. If you want to stop all motion, you must also modify
+            that property.
+            <para/>
+            For more information on hinge control functions, see the project wiki.
+            </remarks>
+        </member>
+        <member name="M:TinMan.Hinge.ValidateAngle(TinMan.Angle)">
+            <summary>
+            Throws an exception if <paramref name="angle"/> is outside the the range of
+            <see cref="P:TinMan.Hinge.MinAngle"/> and <see cref="P:TinMan.Hinge.MaxAngle"/>.
+            </summary>
+            <param name="angle">The angle to validate.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="angle"/> is outside the range of
+            <see cref="P:TinMan.Hinge.MinAngle"/> and <see cref="P:TinMan.Hinge.MaxAngle"/>.</exception>
+        </member>
+        <member name="M:TinMan.Hinge.IsAngleValid(TinMan.Angle)">
+            <summary>
+            Gets a value indicating whether <paramref name="angle"/> is within the range of
+            <see cref="P:TinMan.Hinge.MinAngle"/> and <see cref="P:TinMan.Hinge.MaxAngle"/>.
+            </summary>
+            <param name="angle">The angle to validate.</param>
+            <returns><c>true</c> if <paramref name="angle"/> is within the range of
+            <see cref="P:TinMan.Hinge.MinAngle"/> and <see cref="P:TinMan.Hinge.MaxAngle"/>, otherwise <c>false</c>.</returns>
+        </member>
+        <member name="M:TinMan.Hinge.LimitAngle(TinMan.Angle)">
+            <summary>
+            Returns the closest value to <paramref name="angle"/> that is within the range of
+            <see cref="P:TinMan.Hinge.MinAngle"/> and <see cref="P:TinMan.Hinge.MaxAngle"/>.
+            </summary>
+            <param name="angle">The angle to limit.</param>
+            <returns>The limited angle.</returns>
+        </member>
+        <member name="P:TinMan.Hinge.MinAngle">
+            <summary>Gets the minimum angle at which this hinge may be positioned.</summary>
+        </member>
+        <member name="P:TinMan.Hinge.MaxAngle">
+            <summary>Gets the maximum angle at which this hinge may be positioned.</summary>
+        </member>
+        <member name="P:TinMan.Hinge.PerceptorLabel">
+            <summary>Gets the label for the perceptor of this hinge.</summary>
+        </member>
+        <member name="P:TinMan.Hinge.EffectorLabel">
+            <summary>Gets the label for the effector of this hinge.</summary>
+        </member>
+        <member name="P:TinMan.Hinge.Angle">
+            <summary>
+            Gets the current anglular position of this hinge.  This value is updated for each
+            simulation cycle before any agent code is executed.
+            </summary>
+        </member>
+        <member name="P:TinMan.Hinge.DesiredSpeed">
+            <summary>
+            Gets and sets the desired speed of this joint.  Setting this value during the processing
+            of <see cref="M:TinMan.IAgent.Think(TinMan.PerceptorState)"/> results in the necessary command being sent to the
+            simulation server.
+            </summary>
+        </member>
+        <member name="P:TinMan.Hinge.HasControlFunction">
+            <summary>
+            Gets a value indicating whether this hinge has a control function applied.
+            </summary>
+        </member>
+        <member name="T:TinMan.AccelerometerState">
+            <summary>Represents the state of a simulated accelerometer.</summary>
+        </member>
+        <member name="M:TinMan.AccelerometerState.#ctor(System.String,TinMan.Vector3)">
+            <remarks>
+            Most users will not need to use this constructor as this type is only for inbound messages.
+            This constructor is public to allow for unit testing.
+            </remarks>
+        </member>
+        <member name="P:TinMan.AccelerometerState.Label">
+            <summary>Gets the label that identifies the accelerometer.</summary>
+        </member>
+        <member name="P:TinMan.AccelerometerState.AccelerationVector">
+            <summary>Gets the vector direction returned by the accelerometer.</summary>
+        </member>
+        <member name="T:TinMan.HingeControlFunctions">
+            <summary>
+            A collection of extension methods designed to control hinge joints.
+            </summary>
+            <remarks>
+            While these methods could have been added directly to <see cref="T:TinMan.Hinge"/>, the idea is that
+            all hinge control functionality provided with the TinMan framework operates via the same
+            extensibility mechanism that user code would as well.
+            </remarks>
+        </member>
+        <member name="M:TinMan.HingeControlFunctions.MoveToWithGain(TinMan.Hinge,TinMan.Angle,System.Double)">
+            <summary>
+            Starts the process of moving a hinge joint to a specified angular position and holding it there.
+            The value of <paramref name="gain"/> influences the amount of time it will take to achieve
+            <paramref name="desiredAngle"/>.  Smaller gains create slower movements.  Note that high levels
+            of gain will create unstable oscillations that will never settle.
+            </summary>
+            <remarks>
+            Once this method is called, the joint will be controlled in all subsequent simulation cycles until
+            either the hinge's <see cref="P:TinMan.Hinge.DesiredSpeed"/> is set, or <see cref="M:TinMan.Hinge.ClearControlFunction"/>
+            is called.
+            </remarks>
+            <param name="hinge">The <see cref="T:TinMan.Hinge"/> to control the angle of.</param>
+            <param name="desiredAngle">The desired target angle for the hinge.</param>
+            <param name="gain">The gain to use when calculating the angular speed each cycle.  The speed is
+            calculated as the product of the angular difference and <paramref name="gain"/>.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="hinge"/> is <c>null</c>.</exception>
+        </member>
+        <member name="T:TinMan.GeometryUtil">
+            <summary>
+            A collection of static geometry-related utility methods.
+            </summary>
+        </member>
+        <member name="M:TinMan.GeometryUtil.CalculateDistanceAlongLineThatIsClosestToPoint(TinMan.Vector3,TinMan.Vector3,TinMan.Vector3)">
+            <summary>
+            Calculates the distance along a line that is closest to <paramref name="point"/>.
+            </summary>
+            <param name="origin">The starting point of the line.</param>
+            <param name="direction">The direction of the line.</param>
+            <param name="point"></param>
+            <returns></returns>
+        </member>
+        <member name="T:TinMan.AngularSpeed">
+            <summary>
+            Represents an angular speed as a double-precision floating point value.
+            </summary>
+        </member>
+        <member name="F:TinMan.AngularSpeed.Zero">
+            <summary>A constant angular speed of zero.</summary>
+        </member>
+        <member name="F:TinMan.AngularSpeed.NaN">
+            <summary>
+            Gets an anglular speed whose value in degrees/sec and radians/sec is <see cref="F:System.Double.NaN"/>.
+            Returns <see cref="P:TinMan.AngularSpeed.IsNaN"/> as <c>true</c>.
+            </summary>
+        </member>
+        <member name="M:TinMan.AngularSpeed.FromRadiansPerSecond(System.Double)">
+            <summary>Creates an angular speed for the specified number of radians per second.</summary>
+            <param name="radiansPerSecond"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.AngularSpeed.FromDegreesPerSecond(System.Double)">
+            <summary>Creates an angular speed for the specified number of degrees per second.</summary>
+            <param name="degreesPerSecond"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TinMan.AngularSpeed.Limit(TinMan.AngularSpeed,TinMan.AngularSpeed)">
+            <summary>
+            Returns the angular speed nearest to this that is within the range from <paramref name="lowerLimit"/>
+            and <paramref name="upperLimit"/>.  The returned value is clamped within the specified limits.
+            </summary>
+            <param name="lowerLimit"></param>
+            <param name="upperLimit"></param>
+            <returns></returns>
+        </member>
+        <member name="P:TinMan.AngularSpeed.RadiansPerSecond">
+            <summary>Gets the angular speed as a double value in radians per second.</summary>
+        </member>
+        <member name="P:TinMan.AngularSpeed.DegreesPerSecond">
+            <summary>Gets the angular speed as a double value in degrees per second.</summary>
+        </member>
+        <member name="P:TinMan.AngularSpeed.IsNaN">
+            <summary>
+            Gets a value indicating whether this angular speed's value is <see cref="F:System.Double.NaN"/>
+            in both radians/sec and degrees/sec.
+            </summary>
+        </member>
+        <member name="P:TinMan.AngularSpeed.Abs">
+            <summary>
+            Gets the absolute value.  If this angular speed is negative, it returns the value
+            multiplied by negative one.
+            </summary>
+        </member>
+        <member name="T:TinMan.HingeState">
+            <summary>Represents the state of a simulated hinge joint.</summary>
+        </member>
+        <member name="M:TinMan.HingeState.#ctor(System.String,TinMan.Angle)">
+            <remarks>
+            Most users will not need to use this constructor as this type is only for inbound messages.
+            This constructor is public to allow for unit testing.
+            </remarks>
+        </member>
+        <member name="P:TinMan.HingeState.Label">
+            <summary>Gets the label that identifies the hinge joint.</summary>
+        </member>
+        <member name="P:TinMan.HingeState.Angle">
+            <summary>Gets the current angle of the hinge joint.</summary>
+        </member>
+    </members>
+</doc>

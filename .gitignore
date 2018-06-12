@@ -1,0 +1,10 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/player/v15
+/.vs/player/DesignTimeBuild
+/player/bin
+/player/obj/x86
+/.vs/NirCode2/v15
+/.vs

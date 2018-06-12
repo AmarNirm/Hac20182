@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D8FE8741-2A4C-42C5-98F7-12FC8CC5A670}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>RoboCup</RootNamespace>
+    <AssemblyName>RoboCup</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2 Sides debug configuration|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\2 Sides debug configuration\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug with opponent|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug with opponent\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="TinMan">
+      <HintPath>External Resources\TinMan.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Entities\Coach.cs" />
+    <Compile Include="Entities\Formations\Formation_4_4_2.cs" />
+    <Compile Include="Entities\Formations\IFormation.cs" />
+    <Compile Include="Entities\Formations\EnglandFormation.cs" />
+    <Compile Include="Entities\ICoach.cs" />
+    <Compile Include="Entities\Players\Defenders\CentralDefender.cs" />
+    <Compile Include="Entities\Players\Defenders\CentralDefenderLeft.cs" />
+    <Compile Include="Entities\Players\Defenders\CentralDefenderRight.cs" />
+    <Compile Include="Entities\Players\Defenders\Defender.cs" />
+    <Compile Include="Entities\Players\Defenders\FullBack.cs" />
+    <Compile Include="Entities\Players\Defenders\LeftFullBack.cs" />
+    <Compile Include="Entities\Players\Defenders\LeftWingBack.cs" />
+    <Compile Include="Entities\Players\Defenders\RightFullBack.cs" />
+    <Compile Include="Entities\Players\Defenders\RightWingBack.cs" />
+    <Compile Include="Entities\Players\Defenders\Sweeper.cs" />
+    <Compile Include="Entities\Players\Defenders\WingBack.cs" />
+    <Compile Include="Entities\Players\Forwards\Forward.cs" />
+    <Compile Include="Entities\Players\Forwards\Striker.cs" />
+    <Compile Include="Entities\Players\Forwards\WithdrawnStriker.cs" />
+    <Compile Include="Entities\Players\Goalkeeper.cs" />
+    <Compile Include="Entities\Players\Midfielders\AttackingMidfielder.cs" />
+    <Compile Include="Entities\Players\Midfielders\CentralMidfielder.cs" />
+    <Compile Include="Entities\Players\Midfielders\DefendingMidfielder.cs" />
+    <Compile Include="Entities\Players\Midfielders\LeftWideMidfielders.cs" />
+    <Compile Include="Entities\Players\Midfielders\Midfielder.cs" />
+    <Compile Include="Entities\Players\Midfielders\RightWideMidfielders.cs" />
+    <Compile Include="Entities\Players\Midfielders\WideMidfielders.cs" />
+    <Compile Include="Entities\Players\DefenderExample.cs" />
+    <Compile Include="Entities\Players\AttackerExample.cs" />
+    <Compile Include="Entities\Players\NirAttacker.cs" />
+    <Compile Include="Entities\Team.cs" />
+    <Compile Include="Infrastructure\FieldLocations.cs" />
+    <Compile Include="Infrastructure\FlagNameToPointF.cs" />
+    <Compile Include="Infrastructure\Position.cs" />
+    <Compile Include="Infrastructure\SeenCoachObject.cs" />
+    <Compile Include="Infrastructure\SeenObject.cs" />
+    <Compile Include="Infrastructure\Utils.cs" />
+    <Compile Include="Interfaces\IPlayer.cs" />
+    <Compile Include="Interfaces\ISensorInput.cs" />
+    <Compile Include="Memory.cs" />
+    <Compile Include="ObjectsInfo\BallInfo.cs" />
+    <Compile Include="ObjectsInfo\FlagInfo.cs" />
+    <Compile Include="ObjectsInfo\GoalInfo.cs" />
+    <Compile Include="ObjectsInfo\LineInfo.cs" />
+    <Compile Include="ObjectsInfo\ObjectInfo.cs" />
+    <Compile Include="ObjectsInfo\PlayerInfo.cs" />
+    <Compile Include="Entities\Players\Player.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Interfaces\ISendCommand.cs" />
+    <Compile Include="Robot.cs" />
+    <Compile Include="SenseBodyInfo.cs" />
+    <Compile Include="SoccerParams.cs" />
+    <Compile Include="VisualInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
