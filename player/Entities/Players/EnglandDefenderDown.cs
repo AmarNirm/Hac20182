@@ -76,7 +76,8 @@ namespace RoboCup
                         }
                         else
                         {
-                            KickToGoal();
+                            //KickToGoal();
+                            KickTowardsTeamMate(FindAttackerPosition());
                         }
                     }
                     else
@@ -112,6 +113,13 @@ namespace RoboCup
             else
                 targetPoint.Y -= 3F;
 
+            var angleToPoint = CalcAngleToPoint(targetPoint);
+            m_robot.Kick(100, angleToPoint);
+        }
+
+        private void KickTowardsTeamMate(PointF TeamMatePos)
+        {
+            PointF targetPoint = TeamMatePos;
             var angleToPoint = CalcAngleToPoint(targetPoint);
             m_robot.Kick(100, angleToPoint);
         }

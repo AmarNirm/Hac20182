@@ -265,6 +265,13 @@ namespace RoboCup
             }
         }
 
+        protected PointF FindAttackerPosition()
+        {
+            int CloserAttacker = FindAtackerClosestToTheBall();
+            var Attacker = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {CloserAttacker}");
+            return Attacker.Pos.Value;
+        }
+
         protected SeenCoachObject GetBall()
         {
             while (!m_timeOver)
