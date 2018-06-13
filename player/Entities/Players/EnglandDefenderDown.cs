@@ -4,26 +4,33 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using RoboCup.Infrastructure;
 
 namespace RoboCup
 {
-    public class EnglandAttackerDown : Player
+    public class EnglandDefenderDown : Player
     {
         private const int WAIT_FOR_MSG_TIME = 10;
-
-        public EnglandAttackerDown(Team team, ICoach coach)
+        private bool Init;
+        public EnglandDefenderDown(Team team, ICoach coach)
             : base(team, coach)
         {
-            m_startPosition = new PointF(m_sideFactor * 10, 0);
+            if (m_side == 'l')
+            {
+                m_startPosition.X = -32;
+                m_startPosition.Y = 10;
+            }
+            else
+            {
+                m_startPosition.X = 32;
+                m_startPosition.Y = 10;
+            }
         }
 
         public override void play()
         {
-            //Thread.Sleep(5000);
             // first move to start position
             m_robot.Move(m_startPosition.X, m_startPosition.Y);
 
@@ -34,15 +41,17 @@ namespace RoboCup
             {
                 try
                 {
-                    ball = GetBall();
-                    bool onAttackerSide = false;
-                    if (m_side == 'l')
-                        onAttackerSide = ball.Pos.Value.X >= -5; // -5
-                    else
-                        onAttackerSide = ball.Pos.Value.X <= 5; // 5
-
-                    if (onAttackerSide)
+                    if (!Init)
                     {
+                        Init = MoveToPosition(m_startPosition, OpponentGoal);
+                        if (Init)
+                        {
+                            Console.WriteLine("Defender in position!");
+                        }
+                    }
+                    else if (IsBallInMyHalf())
+                    {
+                        ball = GetBall();
                         if (GetDistanceFrom(ball.Pos.Value) > 1.5)
                         {
                             AdvanceToBall(ball);
@@ -50,14 +59,15 @@ namespace RoboCup
                         else
                         {
                             goal = GetGoalPosition(false);
-                            KickToGoal(goal);
+                            KickToGoal();
                         }
                     }
                     else
                     {
-                        AdvanceToStartPoint();
+                        ball = GetBall();
+                        var nextPos = new PointF(m_startPosition.X, ball.Pos.Value.Y);
+                        MoveToPosition(nextPos, OpponentGoal);
                     }
-
 
                     // sleep one step to ensure that we will not send
                     // two commands in one cycle.
@@ -77,15 +87,16 @@ namespace RoboCup
             }
         }
 
-        private void AdvanceToStartPoint()
+        private void KickToGoal()
         {
-            PointF downInitialPoint = new PointF(26, 20);
-            if (m_side == 'l')
-                downInitialPoint.X = 26;
+            PointF targetPoint = OpponentGoal;
+            if (Utils.GetRandomBoolean())
+                targetPoint.Y += 3F;
             else
-                downInitialPoint.X *= -1;
+                targetPoint.Y -= 3F;
 
-            MoveToPosition(downInitialPoint, null);
+            var angleToPoint = CalcAngleToPoint(targetPoint);
+            m_robot.Kick(100, angleToPoint);
         }
 
         private void AdvanceToBall(SeenCoachObject ball)
@@ -108,27 +119,6 @@ namespace RoboCup
             }
         }
 
-        private void KickToGoal(PointF? goal)
-        {
-            PointF targetPoint = OpponentGoal;
-            if (Utils.GetRandomBoolean())
-                targetPoint.Y += 3F;
-            else
-                targetPoint.Y -= 3F;
-
-            var angleToPoint = CalcAngleToPoint(targetPoint);
-
-            if (GetDistanceFrom(targetPoint) < 25)
-            {
-                //Console.WriteLine(angleToPoint);
-                m_robot.Kick(100, angleToPoint);
-            }
-            else
-            {
-                m_robot.Kick(20, CalcAngleToPoint(goal.Value));
-            }
-        }
-
         private SeenObject FindGoal()
         {
             SeenObject obj;
@@ -144,7 +134,7 @@ namespace RoboCup
 
                 if (obj == null)
                 {
-                    m_robot.Turn(-40);
+                    m_robot.Turn(40);
                     m_memory.waitForNewInfo();
                 }
                 else
@@ -179,6 +169,23 @@ namespace RoboCup
 
             return bodyInfo;
         }
+
+        public bool IsBallInMyHalf()
+        {
+            var ball = GetBall();
+            bool onDefenderSide = false;
+            if (m_side == 'l')
+                onDefenderSide = ball.Pos.Value.X <= 5;
+            else
+                onDefenderSide = ball.Pos.Value.X >= -5;
+
+            return onDefenderSide;
+        }
+
+        public bool AmITheClosesDefenderToBall()
+        {
+            return FindDefenderClosestToTheBall() == this.m_number;
+        }
+
     }
 }
-
