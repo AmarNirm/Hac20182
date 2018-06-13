@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using RoboCup;
@@ -21,61 +22,43 @@ namespace player.Entities.Players
         private const float GoalDistance = (float) 1.5;
 
         public Goalkeeper(Team team, ICoach coach)
-            : base(team, coach, isGoalie:true)
+            : base(team, coach, isGoalie: true)
         {
+            FreeKickModeStr = $"free_kick_{m_side}";
         }
 
-        public enum GoalieState
-        {
-            TurnToGoalLine,
-            MoveOnGoalLine,
-            TurnToBall
-        }
-        
-        private bool Init = false;
+        private bool _init;
 
         private PointF StartingPosition
         {
             get
             {
-                if (m_startPosition == null)
+                if (m_startPosition.IsEmpty)
                 {
                     CalcStartingPosition();
                 }
-                return m_startPosition;
-            }
-        }
 
-        private void TurnToBall()
-        {
-            var ball = m_memory.GetSeenObject("ball");
-            if (ball == null)
-            {
-                // If you don't know where is ball then find it
-                m_robot.Turn(40);
-                m_memory.waitForNewInfo();
-            }
-            else
-            {
-                // turn to ball
-                if (ball.Direction.Value > 0.05)
-                {
-                    m_robot.Turn(ball.Direction.Value);
-                }
-                else
-                {
-                    Init = true;
-                }
+                return m_startPosition;
             }
         }
 
         private PointF CalcStartingPosition()
         {
-            float startPosX;
             var goalX = MyGoal.X;
-            startPosX = goalX > 0 ? goalX - GoalDistance : goalX + GoalDistance;
-            m_startPosition = new PointF(startPosX, 0);
+            var x = goalX > 0 ? goalX - GoalDistance : goalX + GoalDistance;
+            m_startPosition = new PointF(x, 0);
             return m_startPosition;
+        }
+
+        private PointF GetFreeKickPosition()
+        {
+            var x = -50;
+            float y = 5;
+            if (Utils.GetRandomBoolean())
+            {
+                y *= -1;
+            }
+            return new PointF(x, y);
         }
 
         public override void play()
@@ -84,95 +67,96 @@ namespace player.Entities.Players
             // first move to start position
             m_robot.Move(m_startPosition.X, m_startPosition.Y);
 
-            CurrentState = GoalieState.TurnToBall;
+            FreeKickPos = GetFreeKickPosition();
 
             while (!m_timeOver)
             {
                 try
                 {
-                    if (m_playMode == $"free_kick_{m_side}")
+                    if (m_playMode == FreeKickModeStr)
                     {
-                        m_robot.Move(2, 7); // move in the penalty box
-                        // Kick horizontally
-                        var me = GetCurrPlayer();
-                        if (TurnTowards(new PointF(OpponentGoal.X, me.Pos.Value.Y)))
+                        // TODO: not tested completely
+                        /*var ball = m_coach.GetSeenCoachObject("ball");
+                        if (ball?.Pos != null)
                         {
-                            m_robot.Kick(100, 0); // Kick horizontally towards the opponent goal
+                            if (ball.Pos.Value != LastBallPos)
+                            {
+                                Console.WriteLine("Goalie: ball moved,");
+                                m_playMode = "";
+                            }
+                        }*/
+
+                        Console.WriteLine("Goalie in free kick mode");
+                        float distance = GetDistanceFrom(FreeKickPos);
+                        Debug.WriteLine($"distance to FreeKickPos = {distance}");
+                        if (distance > DistanceThreshold)
+                        {
+                            Console.WriteLine($"Goalie move to {FreeKickPos}");
+                            m_robot.Move(FreeKickPos.X, FreeKickPos.Y); // move in the penalty box
+                        }
+                        else
+                        {
+                            // Kick horizontally
+                            Console.WriteLine("Goalie in position");
+                            var me = GetCurrPlayer();
+                            if (TurnTowards(new PointF(OpponentGoal.X, me.Pos.Value.Y)))
+                            {
+                                Console.WriteLine("Goalie kick!");
+                                m_robot.Kick(100, 0); // Kick horizontally towards the opponent goal
+                                m_playMode = "";
+                            }
                         }
                     }
-                    else
+                    if (m_playMode != FreeKickModeStr) 
                     {
-                        if (!Init)
+                        if (!_init)
                         {
-                            Init = MoveToPosition(StartingPosition, OpponentGoal);
-                            if (Init)
+                            _init = MoveToPosition(StartingPosition, OpponentGoal);
+                            if (_init)
                             {
                                 Console.WriteLine("Goalkeeper in position!");
                             }
                         }
                         else
                         {
-                            //var ball = m_memory.GetSeenObject("ball");
                             var ball = m_coach.GetSeenCoachObject("ball");
-                            /*switch (CurrentState)
-                            {
-                                case GoalieState.TurnToBall:
-                                    if (ball == null)
-                                    { // Look for the ball
-                                        m_robot.Turn(40);
-                                        m_memory.waitForNewInfo();
-                                    }
-                                    else
-                                    {
-                                        // TODO: if the ball's direction is different
-                                        CurrentState = GoalieState.TurnToGoalLine;
-                                    }
-                                    break;
-                                case GoalieState.TurnToGoalLine:
-                                    // TODO: turn
-                                    var me = GetCurrPlayer();
-                                    float myAngle = me.BodyAngle.Value;
-                                    float ballLastY = 0;
-                                    //if (ballLastY)
-                                    break;
-                                case GoalieState.MoveOnGoalLine:
-                                    break;
-                            }
-            
-                            var myObj = GetCurrPlayer();
-                            
-                            var goal = GetGoalPosition(false);*/
                             PointF? ballPos = null;
                             if (ball?.Pos != null)
                             {
                                 ballPos = ball.Pos.Value;
                             }
 
-                            // TODO: look at ball
                             if (ballPos == null)
                             {
-                                CurrentState = GoalieState.TurnToBall;
                             }
-                            else if (GetDistanceFrom(ballPos.Value) > 15.0) // If ball is far
+                            else if (GetDistanceFrom(ballPos.Value) > 15.0) // If ball is far, turn to it
                             {
                                 TurnTowards(ballPos.Value);
                             }
-                            else if (GetDistanceFrom(ballPos.Value) > 1.7) // If ball is close
+                            else if (GetDistanceFrom(ballPos.Value) > 1.7) // If ball is somewhat close, move forward
                             {
                                 // TODO: move to the ball! and catch if we're in the penalty box
                             }
                             else // The ball is very close -> catch
                             {
+//                                var memoryBall = m_memory.GetSeenObject("ball");
+//                                double ballDirection = memoryBall.Direction.Value;
                                 double ballDirection = CalcAngleToPoint(ballPos.Value);
                                 Console.WriteLine($"Catching in direction {ballDirection}");
                                 m_robot.Catch(ballDirection);
+                                // TODO: Determine if we catched the ball - this doesn't work well
+//                                if (ballPos.Value == LastBallPos) // then the catch probably succeed
+//                                {
+//                                    m_playMode = FreeKickModeStr;
+//                                }
+//                                LastBallPos = ballPos.Value;
                             }
                         }
                     }
                 }
                 catch
                 {
-                    Console.WriteLine("Exception @ Goalie");
+                    // ignored
                 }
 
                 // sleep one step to ensure that we will not send
@@ -188,19 +172,8 @@ namespace player.Entities.Players
             }
         }
 
-        public GoalieState CurrentState { get; set; }
-
-        private SenseBodyInfo GetBodyInfo()
-        {
-            m_robot.SenseBody();
-            SenseBodyInfo bodyInfo = null;
-            while (bodyInfo == null)
-            {
-                Thread.Sleep(WAIT_FOR_MSG_TIME);
-                bodyInfo = m_memory.getBodyInfo();
-            }
-
-            return bodyInfo;
-        }
+        private PointF LastBallPos { get; set; }
+        private PointF FreeKickPos { get; set; }
+        private string FreeKickModeStr { get; set; }
     }
 }
