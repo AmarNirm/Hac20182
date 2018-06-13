@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using RoboCup;
@@ -119,13 +120,13 @@ namespace RoboCup
                 float relAngle = CalcAngleToPoint(targetPos);
                 if (Math.Abs(relAngle) >= AngleThreshold)
                 {
-                    Console.WriteLine($"Player at side={m_side}, num={m_number} is turning {relAngle} degrees");
+                    //Console.WriteLine($"Player at side={m_side}, num={m_number} is turning {relAngle} degrees");
                     m_robot.Turn(relAngle);
                 }
                 else
                 {
                     // Slow down a bit when approaching the target
-                    Console.WriteLine($"Player at side={m_side}, num={m_number} is dashing to {targetPos}");
+                    //Console.WriteLine($"Player at side={m_side}, num={m_number} is dashing to {targetPos}");
                     m_robot.Dash(70 * distance);
                 }
             }
@@ -136,7 +137,7 @@ namespace RoboCup
                     float relAngle = CalcAngleToPoint(targetTowards);
                     if (Math.Abs(relAngle) >= AngleThreshold)
                     {
-                        Console.WriteLine($"Player at side={m_side}, num={m_number} is turning {relAngle} degrees");
+                        //Console.WriteLine($"Player at side={m_side}, num={m_number} is turning {relAngle} degrees");
                         m_robot.Turn(relAngle);
                     }
                     else
