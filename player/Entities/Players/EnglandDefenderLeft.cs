@@ -84,11 +84,8 @@ namespace RoboCup
                     }
                     else
                     {
-                        //currently not working right due to bug in movetoposition
                         var CurPlayer = this.GetCurrPlayer();
                         var NextPos = new PointF(CurPlayer.Pos.Value.X, ballInfoFromCoach.Pos.Value.Y);
-                        //var NextPos = new PointF(CurPlayer.Pos.Value.X, 10);
-                        //Console.WriteLine($"NextPos.X={NextPos.X}, NextPos.Y={NextPos.Y}");
                         MoveToPosition(NextPos, OpponentGoal);
                        
                     }
