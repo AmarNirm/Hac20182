@@ -81,6 +81,7 @@
     <Compile Include="Entities\Players\Defenders\RightWingBack.cs" />
     <Compile Include="Entities\Players\Defenders\Sweeper.cs" />
     <Compile Include="Entities\Players\Defenders\WingBack.cs" />
+    <Compile Include="Entities\Players\EnglandAttacker.cs" />
     <Compile Include="Entities\Players\Forwards\Forward.cs" />
     <Compile Include="Entities\Players\Forwards\Striker.cs" />
     <Compile Include="Entities\Players\Forwards\WithdrawnStriker.cs" />
@@ -95,7 +96,6 @@
     <Compile Include="Entities\Players\DefenderExample.cs" />
     <Compile Include="Entities\Players\AttackerExample.cs" />
     <Compile Include="Entities\Players\EnglandDefender.cs" />
-    <Compile Include="Entities\Players\NirAttacker.cs" />
     <Compile Include="Entities\Team.cs" />
     <Compile Include="Infrastructure\FieldLocations.cs" />
     <Compile Include="Infrastructure\FlagNameToPointF.cs" />
