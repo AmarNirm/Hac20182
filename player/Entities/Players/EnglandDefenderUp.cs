@@ -37,10 +37,20 @@ namespace RoboCup
             SeenCoachObject ball;
             PointF? goal;
 
+            bool didIReachToGoal = false;
+
             while (!m_timeOver)
             {
                 try
                 {
+                    ball = GetBall();
+                    if ((m_side == 'l' && ball.Pos.Value.X <= GetCurrPlayer().Pos.Value.X) ||
+                        (m_side == 'r' && ball.Pos.Value.X >= GetCurrPlayer().Pos.Value.X))
+                    {
+                        didIReachToGoal = false;
+                    }
+
+
                     if (!Init)
                     {
                         Init = MoveToPosition(m_startPosition, OpponentGoal);
@@ -61,12 +71,21 @@ namespace RoboCup
                             }
                             else
                             {
-                                
+                                if (!didIReachToGoal)
+                                {
+                                    var pointNearGoal = GetGoalPosition(true).Value;
+                                    pointNearGoal.X += 4f;
+                                    pointNearGoal.Y += 3f;
+                                    didIReachToGoal = MoveToPosition(pointNearGoal, null); 
+                                }
+                                else
+                                {
+                                    MoveToPosition(GetBall().Pos.Value, null);
+                                }
                             }
                         }
                         else
                         {
-                            goal = GetGoalPosition(false);
                             KickToGoal();
                         }
                     }
