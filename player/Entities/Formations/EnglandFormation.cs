@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using player.Entities.Players;
 
 namespace RoboCup
 {
@@ -11,7 +12,8 @@ namespace RoboCup
         public List<Player> InitTeam(Team team, ICoach coach)
         {
             var players = new List<Player>();
-            players.Add(new EnglandAttacker(team, coach));
+            players.Add(new Goalkeeper(team, coach));
+            players.Add(new NirAttacker(team, coach));
             return players;
         }
     }
