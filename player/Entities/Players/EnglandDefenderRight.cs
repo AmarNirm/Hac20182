@@ -32,83 +32,90 @@ namespace RoboCup
         public override void play()
         {
             // first move to start position
-            //m_robot.Move(m_startPosition.X, m_startPosition.Y);
-
+            m_robot.Move(m_startPosition.X, m_startPosition.Y);
 
             SeenCoachObject ball;
-            SeenObject goal;
+            PointF? goal;
 
             while (!m_timeOver)
             {
-                if (!Init)
-                {
-                    Init = MoveToPosition(m_startPosition, OpponentGoal);
-                    if (Init)
-                    {
-                        Console.WriteLine("Defender in position!");
-                    }
-                }
-
-                if (IsBallInMyHalf())
-                {
-                    //ball = m_memory.GetSeenObject("ball");
-                    ball = m_coach.GetSeenCoachObject("ball");
-                    if (ball == null)
-                    {
-                        // If you don't know where is ball then find it
-                        m_robot.Turn(40);
-                        m_memory.waitForNewInfo();
-                    }
-                    else if (GetDistanceFrom(ball.Pos.Value) > 1.5 && FindDefenderClosestToTheBall() == this.m_number)
-                    {
-                        // If ball is too far then
-                        // turn to ball or 
-                        // if we have correct direction then go to ball
-                        if (CalcAngleToPoint(ball.Pos.Value) != 0)
-                            m_robot.Turn(CalcAngleToPoint(ball.Pos.Value));
-                        else
-                            m_robot.Dash(10 * GetDistanceFrom(ball.Pos.Value));
-                    }
-                    else
-                    {
-                        goal = FindGoal();
-                        m_robot.Kick(100, goal.Direction.Value);
-                    }
-                }
-                else
-                {
-                    var ballInfoFromCoach = m_coach.GetSeenCoachObject("ball");
-                    if (ballInfoFromCoach == null)
-                    {
-                        // If you don't know where is ball then find it
-                        //m_robot.Turn(40);
-                        //m_memory.waitForNewInfo();
-                    }
-                    else
-                    {
-                        var CurPlayer = this.GetCurrPlayer();
-                        //var NextPos = new PointF(CurPlayer.Pos.Value.X, ballInfoFromCoach.Pos.Value.Y);
-                        var NextPos = new PointF(m_startPosition.X, ballInfoFromCoach.Pos.Value.Y);
-                        MoveToPosition(NextPos, OpponentGoal);
-
-                    }
-
-                }
-                /*         
-                 *         var bodyInfo = GetBodyInfo();
-
-
-                                */
-                // sleep one step to ensure that we will not send
-                // two commands in one cycle.
                 try
                 {
-                    Thread.Sleep(2 * SoccerParams.simulator_step);
-                }
-                catch (Exception e)
-                {
+                    if (!Init)
+                    {
+                        Init = MoveToPosition(m_startPosition, OpponentGoal);
+                        if (Init)
+                        {
+                            Console.WriteLine("Defender in position!");
+                        }
+                    }
+                    else if (IsBallInMyHalf())
+                    {
+                        ball = GetBall();
+                        if (GetDistanceFrom(ball.Pos.Value) > 1.5)
+                        {
+                            AdvanceToBall(ball);
+                        }
+                        else
+                        {
+                            goal = GetGoalPosition(false);
+                            KickToGoal();
+                        }
+                    }
+                    else
+                    {
+                        ball = GetBall();
+                        var nextPos = new PointF(m_startPosition.X, ball.Pos.Value.Y);
+                        MoveToPosition(nextPos, OpponentGoal);
+                    }
 
+                    // sleep one step to ensure that we will not send
+                    // two commands in one cycle.
+                    try
+                    {
+                        Thread.Sleep(2 * SoccerParams.simulator_step);
+                    }
+                    catch (Exception e)
+                    {
+
+                    }
                 }
+                catch (Exception)
+                {
+                    Console.WriteLine("basa");
+                }
+            }
+        }
+
+        private void KickToGoal()
+        {
+            PointF targetPoint = OpponentGoal;
+            if (Utils.GetRandomBoolean())
+                targetPoint.Y += 3F;
+            else
+                targetPoint.Y -= 3F;
+
+            var angleToPoint = CalcAngleToPoint(targetPoint);
+            m_robot.Kick(100, angleToPoint);
+        }
+
+        private void AdvanceToBall(SeenCoachObject ball)
+        {
+            float distanceToBall = GetDistanceFrom(ball.Pos.Value);
+            float directionToBall = CalcAngleToPoint(ball.Pos.Value);
+            bool isDirectionZero = Math.Abs(directionToBall) < 1;
+
+            // If ball is too far then
+            // turn to ball or 
+            // if we have correct direction then go to ball
+            if ((distanceToBall >= 6 && !isDirectionZero) ||
+                (distanceToBall < 6 && Math.Abs(directionToBall) > 10))
+            {
+                m_robot.Turn(directionToBall);
+            }
+            else
+            {
+                m_robot.Dash(100);
             }
         }
 
@@ -165,17 +172,14 @@ namespace RoboCup
 
         public bool IsBallInMyHalf()
         {
-            bool BallInMyHalf = true;
-            var ball = m_coach.GetSeenCoachObject("ball");
-            if (ball == null)
-                //complete 
-                ;
-            if (m_side == 'l' && ball.Pos.Value.X <= 5 || m_side == 'r' && ball.Pos.Value.X >= -5)
-                BallInMyHalf = true;
+            var ball = GetBall();
+            bool onDefenderSide = false;
+            if (m_side == 'l')
+                onDefenderSide = ball.Pos.Value.X <= 5;
             else
-                BallInMyHalf = false;
+                onDefenderSide = ball.Pos.Value.X >= -5;
 
-            return BallInMyHalf;
+            return onDefenderSide;
         }
 
     }

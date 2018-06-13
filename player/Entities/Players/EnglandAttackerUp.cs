@@ -102,12 +102,10 @@ namespace RoboCup
             if ((distanceToBall >= 6 && !isDirectionZero) ||
                 (distanceToBall < 6 && Math.Abs(directionToBall) > 10))
             {
-                Console.WriteLine("Turn Direction = " + directionToBall);
                 m_robot.Turn(directionToBall);
             }
             else
             {
-                Console.WriteLine("Direction = " + directionToBall);
                 m_robot.Dash(100);
             }
         }

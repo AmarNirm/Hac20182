@@ -48,7 +48,7 @@ namespace RoboCup
                     }
                 }
 
-                if(IsBallInMyHalf())
+                else if(IsBallInMyHalf())
                 {
                     ball = m_memory.GetSeenObject("ball");
                     if (ball == null)
