@@ -324,20 +324,19 @@ namespace RoboCup
             }
         }
 
-        public virtual int FindPlayerClosestToTheBall()
+        public virtual int FindDefenderClosestToTheBall()
         {
             SeenCoachObject ballPosByCoach = null;
-            SeenCoachObject objPlayer = null;
+            SeenCoachObject Player = null;
             double Distance = -1;
             double CurrentDistance = -1;
-            string player = "player ";
             int playerListNum = 0;
             int ClosestPlayerToTheBall = -1;
 
 
             var PlayersList = m_coach.GetSeenCoachObjects().Where(kvp => kvp.Value.Name.Contains(m_team.m_teamName)).ToList();
 
-            if (PlayersList.Count > 2)
+            if (PlayersList.Count < 2)
                 return 0;
 
             Object thisLock = new Object();
@@ -345,29 +344,81 @@ namespace RoboCup
             lock (thisLock)
             {
 
-                for (int i = 0; i < PlayersList.Count; i++)
+                for (int i = 3; i < PlayersList.Count; i++)
                 {
                     playerListNum = i + 1;
+                    Player = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {playerListNum}");
                     ballPosByCoach = m_coach.GetSeenCoachObject("ball");
 
 
                     Double BallX = ballPosByCoach.Pos.Value.X;
                     Double BallY = ballPosByCoach.Pos.Value.Y;
 
-                    //objPlayer = m_coach.GetSeenCoachObject(player + m_team.m_teamName + " " + playerListNum.ToString());
-                    objPlayer = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {playerListNum}");
-                    Double PlayerX = objPlayer.Pos.Value.X;
-                    Double PlayerY = objPlayer.Pos.Value.Y;
+                                     
+                    Double PlayerX = Player.Pos.Value.X;
+                    Double PlayerY = Player.Pos.Value.Y;
                     CurrentDistance = Math.Sqrt(Math.Pow(PlayerX - BallX, 2) + Math.Pow(PlayerY - BallY, 2));
-                    if (i == 1)
+                    if (i == 3)
                     {
                         Distance = CurrentDistance;
-                        ClosestPlayerToTheBall = i;
+                        ClosestPlayerToTheBall = 4;
                     }
                     else if (CurrentDistance < Distance)
                     {
                         Distance = CurrentDistance;
-                        ClosestPlayerToTheBall = i;
+                        ClosestPlayerToTheBall = i+1;
+                    }
+
+                }
+
+            }
+
+            return ClosestPlayerToTheBall;
+        }
+
+        public virtual int FindAtackerClosestToTheBall()
+        {
+            SeenCoachObject ballPosByCoach = null;
+            SeenCoachObject Player = null;
+            double Distance = -1;
+            double CurrentDistance = -1;
+            int playerListNum = 0;
+            int ClosestPlayerToTheBall = -1;
+
+
+            var PlayersList = m_coach.GetSeenCoachObjects().Where(kvp => kvp.Value.Name.Contains(m_team.m_teamName)).ToList();
+
+            if (PlayersList.Count < 2)
+                return 0;
+
+            Object thisLock = new Object();
+
+            lock (thisLock)
+            {
+
+                for (int i = 1; i < 3; i++)
+                {
+                    playerListNum = i + 1;
+                    Player = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {playerListNum}");
+                    ballPosByCoach = m_coach.GetSeenCoachObject("ball");
+
+
+                    Double BallX = ballPosByCoach.Pos.Value.X;
+                    Double BallY = ballPosByCoach.Pos.Value.Y;
+
+
+                    Double PlayerX = Player.Pos.Value.X;
+                    Double PlayerY = Player.Pos.Value.Y;
+                    CurrentDistance = Math.Sqrt(Math.Pow(PlayerX - BallX, 2) + Math.Pow(PlayerY - BallY, 2));
+                    if (i == 1)
+                    {
+                        Distance = CurrentDistance;
+                        ClosestPlayerToTheBall = 2;
+                    }
+                    else if (CurrentDistance < Distance)
+                    {
+                        Distance = CurrentDistance;
+                        ClosestPlayerToTheBall = i + 1;
                     }
 
                 }

@@ -57,7 +57,7 @@ namespace RoboCup
                         m_robot.Turn(40);
                         m_memory.waitForNewInfo();
                     }
-                    else if (ball.Distance.Value > 1.5)
+                    else if (ball.Distance.Value > 1.5 && FindDefenderClosestToTheBall() == this.m_number)
                     {
                         // If ball is too far then
                         // turn to ball or 
@@ -70,7 +70,7 @@ namespace RoboCup
                     else
                     {
                         goal = FindGoal();
-                        m_robot.Kick(25, goal.Direction.Value);
+                        m_robot.Kick(100, goal.Direction.Value);
                     }
                 }
                 else
@@ -84,11 +84,8 @@ namespace RoboCup
                     }
                     else
                     {
-                        //currently not working right due to bug in movetoposition
                         var CurPlayer = this.GetCurrPlayer();
                         var NextPos = new PointF(CurPlayer.Pos.Value.X, ballInfoFromCoach.Pos.Value.Y);
-                        //var NextPos = new PointF(CurPlayer.Pos.Value.X, 10);
-                        //Console.WriteLine($"NextPos.X={NextPos.X}, NextPos.Y={NextPos.Y}");
                         MoveToPosition(NextPos, OpponentGoal);
                        
                     }

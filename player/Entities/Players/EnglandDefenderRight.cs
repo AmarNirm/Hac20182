@@ -19,12 +19,12 @@ namespace RoboCup
         {
             if (m_side == 'l')
             {
-                m_startPosition.X = -25;
+                m_startPosition.X = -32;
                 m_startPosition.Y = 10;
             }
             else
             {
-                m_startPosition.X = 25;
+                m_startPosition.X = 32;
                 m_startPosition.Y = 10;
             }
         }
@@ -35,7 +35,8 @@ namespace RoboCup
             //m_robot.Move(m_startPosition.X, m_startPosition.Y);
 
 
-            SeenObject ball, goal;
+            SeenCoachObject ball;
+            SeenObject goal;
 
             while (!m_timeOver)
             {
@@ -50,27 +51,28 @@ namespace RoboCup
 
                 if (IsBallInMyHalf())
                 {
-                    ball = m_memory.GetSeenObject("ball");
+                    //ball = m_memory.GetSeenObject("ball");
+                    ball = m_coach.GetSeenCoachObject("ball");
                     if (ball == null)
                     {
                         // If you don't know where is ball then find it
                         m_robot.Turn(40);
                         m_memory.waitForNewInfo();
                     }
-                    else if (ball.Distance.Value > 1.5)
+                    else if (GetDistanceFrom(ball.Pos.Value) > 1.5 && FindDefenderClosestToTheBall() == this.m_number)
                     {
                         // If ball is too far then
                         // turn to ball or 
                         // if we have correct direction then go to ball
-                        if (ball.Direction.Value != 0)
-                            m_robot.Turn(ball.Direction.Value);
+                        if (CalcAngleToPoint(ball.Pos.Value) != 0)
+                            m_robot.Turn(CalcAngleToPoint(ball.Pos.Value));
                         else
-                            m_robot.Dash(10 * ball.Distance.Value);
+                            m_robot.Dash(10 * GetDistanceFrom(ball.Pos.Value));
                     }
                     else
                     {
                         goal = FindGoal();
-                        m_robot.Kick(25, goal.Direction.Value);
+                        m_robot.Kick(100, goal.Direction.Value);
                     }
                 }
                 else
@@ -84,11 +86,9 @@ namespace RoboCup
                     }
                     else
                     {
-                        //currently not working right due to bug in movetoposition
                         var CurPlayer = this.GetCurrPlayer();
-                        var NextPos = new PointF(CurPlayer.Pos.Value.X, ballInfoFromCoach.Pos.Value.Y);
-                        //var NextPos = new PointF(CurPlayer.Pos.Value.X, 10);
-                        //Console.WriteLine($"NextPos.X={NextPos.X}, NextPos.Y={NextPos.Y}");
+                        //var NextPos = new PointF(CurPlayer.Pos.Value.X, ballInfoFromCoach.Pos.Value.Y);
+                        var NextPos = new PointF(m_startPosition.X, ballInfoFromCoach.Pos.Value.Y);
                         MoveToPosition(NextPos, OpponentGoal);
 
                     }
@@ -170,7 +170,7 @@ namespace RoboCup
             if (ball == null)
                 //complete 
                 ;
-            if (m_side == 'l' && ball.Pos.Value.X <= 0 || m_side == 'r' && ball.Pos.Value.X >= 0)
+            if (m_side == 'l' && ball.Pos.Value.X <= 5 || m_side == 'r' && ball.Pos.Value.X >= -5)
                 BallInMyHalf = true;
             else
                 BallInMyHalf = false;
