@@ -179,7 +179,7 @@ namespace player.Entities.Players
                                 else
                                 {
                                     // Move to the ball and kick
-                                    if (MoveToPosition(ballPos.Value, null))
+                                    if (MoveToPosition(ballPos.Value, null, approximate:true))
                                     {
                                         KickToOppGoal();
                                     }
