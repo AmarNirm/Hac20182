@@ -167,10 +167,14 @@ namespace RoboCup
             var myAngle = myObj.BodyAngle.Value;
             var xp = myObj.Pos.Value.X;
             var yp = myObj.Pos.Value.Y;
-            // TODO: deal with 0
             float deltaY = point.Y - yp;
             float deltaX = point.X - xp;
-            float alphaPlayerToTargetRad = (float)Math.Atan(deltaY / deltaX);
+            if (deltaX == 0) // Prevent division by 0
+            {
+                deltaX += 0.001f;
+            }
+
+            float alphaPlayerToTargetRad = (float) Math.Atan(deltaY / deltaX);
             float alphaPlayerToTarget = Utils.RadToDeg(alphaPlayerToTargetRad);
             float relAngle = 0;
             if ((deltaY > 0 && deltaX > 0) || (deltaY < 0 && deltaX > 0)) // alpha > 0
@@ -181,7 +185,15 @@ namespace RoboCup
             {
                 relAngle = -myAngle - (180 - alphaPlayerToTarget);
             }
+
             relAngle = Utils.NormalizeAngle(relAngle);
+            // Correct the angle (for the case of deltaX ~ 0)
+            var absAngle = Utils.NormalizeAngle(myAngle + relAngle);
+            if ((deltaY > 0 && absAngle < 0) || (deltaY < 0 && absAngle > 0))
+            {
+                relAngle *= -1;
+            }
+
             return relAngle;
         }
 

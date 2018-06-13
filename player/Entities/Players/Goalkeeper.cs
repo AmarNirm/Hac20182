@@ -85,95 +85,94 @@ namespace player.Entities.Players
             m_robot.Move(m_startPosition.X, m_startPosition.Y);
 
             CurrentState = GoalieState.TurnToBall;
-            
+
             while (!m_timeOver)
             {
-                if (m_playMode == $"free_kick_{m_side}")
+                try
                 {
-                    m_robot.Move(2, 7); // move in the penalty box
-                    // Kick horizontally
-                    // TODO: TurnTowards()
-                    var me = GetCurrPlayer();
-                    float myAngle = me.BodyAngle.Value;
-                    float targetAngle = m_side == 'l' ? 0 : 180;
-                    float angleDiff = targetAngle - myAngle;
-                    if (angleDiff < 0.1)
+                    if (m_playMode == $"free_kick_{m_side}")
                     {
-                        m_robot.Turn(angleDiff);
+                        m_robot.Move(2, 7); // move in the penalty box
+                        // Kick horizontally
+                        var me = GetCurrPlayer();
+                        if (TurnTowards(new PointF(OpponentGoal.X, me.Pos.Value.Y)))
+                        {
+                            m_robot.Kick(100, 0); // Kick horizontally towards the opponent goal
+                        }
                     }
                     else
                     {
-                        m_robot.Kick(100, 0); // Kick horizontally towards the opponent goal
+                        if (!Init)
+                        {
+                            Init = MoveToPosition(StartingPosition, OpponentGoal);
+                            if (Init)
+                            {
+                                Console.WriteLine("Goalkeeper in position!");
+                            }
+                        }
+                        else
+                        {
+                            //var ball = m_memory.GetSeenObject("ball");
+                            var ball = m_coach.GetSeenCoachObject("ball");
+                            /*switch (CurrentState)
+                            {
+                                case GoalieState.TurnToBall:
+                                    if (ball == null)
+                                    { // Look for the ball
+                                        m_robot.Turn(40);
+                                        m_memory.waitForNewInfo();
+                                    }
+                                    else
+                                    {
+                                        // TODO: if the ball's direction is different
+                                        CurrentState = GoalieState.TurnToGoalLine;
+                                    }
+                                    break;
+                                case GoalieState.TurnToGoalLine:
+                                    // TODO: turn
+                                    var me = GetCurrPlayer();
+                                    float myAngle = me.BodyAngle.Value;
+                                    float ballLastY = 0;
+                                    //if (ballLastY)
+                                    break;
+                                case GoalieState.MoveOnGoalLine:
+                                    break;
+                            }
+            
+                            var myObj = GetCurrPlayer();
+                            
+                            var goal = GetGoalPosition(false);*/
+                            PointF? ballPos = null;
+                            if (ball?.Pos != null)
+                            {
+                                ballPos = ball.Pos.Value;
+                            }
+
+                            // TODO: look at ball
+                            if (ballPos == null)
+                            {
+                                CurrentState = GoalieState.TurnToBall;
+                            }
+                            else if (GetDistanceFrom(ballPos.Value) > 15.0) // If ball is far
+                            {
+                                TurnTowards(ballPos.Value);
+                            }
+                            else if (GetDistanceFrom(ballPos.Value) > 1.7) // If ball is close
+                            {
+                                // TODO: move to the ball! and catch if we're in the penalty box
+                            }
+                            else // The ball is very close -> catch
+                            {
+                                double ballDirection = CalcAngleToPoint(ballPos.Value);
+                                Console.WriteLine($"Catching in direction {ballDirection}");
+                                m_robot.Catch(ballDirection);
+                            }
+                        }
                     }
                 }
-                else
+                catch
                 {
-                    if (!Init)
-                    {
-                        Init = MoveToPosition(StartingPosition, OpponentGoal);
-                        if (Init)
-                        {
-                            Console.WriteLine("Goalkeeper in position!");
-                        }
-                    }
-                    else
-                    {
-                        //var ball = m_memory.GetSeenObject("ball");
-                        var ball = m_coach.GetSeenCoachObject("ball");
-                        /*switch (CurrentState)
-                        {
-                            case GoalieState.TurnToBall:
-                                if (ball == null)
-                                { // Look for the ball
-                                    m_robot.Turn(40);
-                                    m_memory.waitForNewInfo();
-                                }
-                                else
-                                {
-                                    // TODO: if the ball's direction is different
-                                    CurrentState = GoalieState.TurnToGoalLine;
-                                }
-                                break;
-                            case GoalieState.TurnToGoalLine:
-                                // TODO: turn
-                                var me = GetCurrPlayer();
-                                float myAngle = me.BodyAngle.Value;
-                                float ballLastY = 0;
-                                //if (ballLastY)
-                                break;
-                            case GoalieState.MoveOnGoalLine:
-                                break;
-                        }
-        
-                        var myObj = GetCurrPlayer();
-                        
-                        var goal = GetGoalPosition(false);*/
-                        PointF? ballPos = null;
-                        if (ball?.Pos != null)
-                        {
-                            ballPos = ball.Pos.Value;
-                        }
-
-                        // TODO: look at ball
-                        if (ballPos == null)
-                        {
-                            CurrentState = GoalieState.TurnToBall;
-                        }
-                        else if (GetDistanceFrom(ballPos.Value) > 15.0) // If ball is far
-                        {
-                            TurnTowards(ballPos.Value);
-                        }
-                        else if (GetDistanceFrom(ballPos.Value) > 1.7) // If ball is close
-                        {
-                            // TODO: move to the ball! and catch if we're in the penalty box
-                        }
-                        else // The ball is very close -> catch
-                        {
-                            double ballDirection = CalcAngleToPoint(ballPos.Value);
-                            Console.WriteLine($"Catching in direction {ballDirection}");
-                            m_robot.Catch(ballDirection);
-                        }
-                    }
+                    Console.WriteLine("Exception @ Goalie");
                 }
 
                 // sleep one step to ensure that we will not send
@@ -182,9 +181,9 @@ namespace player.Entities.Players
                 {
                     Thread.Sleep(2 * SoccerParams.simulator_step);
                 }
-                catch (Exception e)
+                catch
                 {
-
+                    // ignored
                 }
             }
         }
