@@ -41,21 +41,40 @@ namespace RoboCup
                         m_robot.Turn(-40);
                         m_memory.waitForNewInfo();
                     }
-                    else if (ball.Distance.Value > 1.5)
-                    {
-                        // If ball is too far then
-                        // turn to ball or 
-                        // if we have correct direction then go to ball
-                        if ((ball.Distance.Value >= 6 && ball.Direction.Value != 0) ||
-                            (ball.Distance.Value < 6 && ball.Direction.Value > 10))
-                            m_robot.Turn(ball.Direction.Value);
-                        else
-                            m_robot.Dash(100);
-                    }
                     else
                     {
-                        goal = FindGoal();
-                        KickToGoal(goal);
+                        var ballFromCoach = GetBall();
+                        bool onAttackerSide = false;
+                        if (m_side == 'l')
+                            onAttackerSide = ballFromCoach.Pos.Value.X > -5;
+                        else
+                            onAttackerSide = ballFromCoach.Pos.Value.X < 5;
+
+                        if (onAttackerSide)
+                        {
+                            if (ball.Distance.Value > 1.5)
+                            {
+                                AdvanceToBall(ball);
+                            }
+                            else
+                            {
+                                goal = FindGoal();
+                                KickToGoal(goal);
+                            }
+                        }
+                        else
+                        {
+                            if (ball.Distance.Value > 1.5)
+                            {
+                                AdvanceToBall(ball);
+                            }
+                            else
+                            {
+                                goal = FindGoal();
+                                KickToGoal(goal);
+                            }
+                        }
+
                     }
 
                     // sleep one step to ensure that we will not send
@@ -74,6 +93,25 @@ namespace RoboCup
                     Console.WriteLine("basa");
                 }
             }
+        }
+
+        private void AdvanceToStartPoint()
+        {
+            PointF upInitialPoint = new PointF(26, 17);
+            //PointF downInitialPoint = new PointF(26, 51);
+            MoveToPosition(upInitialPoint, null);
+        }
+
+        private void AdvanceToBall(SeenObject ball)
+        {
+            // If ball is too far then
+            // turn to ball or 
+            // if we have correct direction then go to ball
+            if ((ball.Distance.Value >= 6 && ball.Direction.Value != 0) ||
+                (ball.Distance.Value < 6 && ball.Direction.Value > 10))
+                m_robot.Turn(ball.Direction.Value);
+            else
+                m_robot.Dash(100);
         }
 
         private void KickToGoal(SeenObject goal)
