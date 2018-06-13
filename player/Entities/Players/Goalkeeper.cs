@@ -25,7 +25,10 @@ namespace player.Entities.Players
             : base(team, coach, isGoalie: true)
         {
             FreeKickModeStr = $"free_kick_{m_side}";
+            RandomGenerator = new Random();
         }
+
+        public Random RandomGenerator { get; set; }
 
         private bool _init;
 
@@ -59,6 +62,17 @@ namespace player.Entities.Players
                 y *= -1;
             }
             return new PointF(x, y);
+        }
+
+        private void KickToOppGoal()
+        {
+            // Kick towards the opponent goal, but pick the exact angle randomly
+            var angleToOpponentGoal = CalcAngleToPoint(OpponentGoal);
+            var rand = RandomGenerator.NextDouble();
+            rand -= 0.5;
+            rand *= 2; // rand is in [-1,1]
+            var kickAngle = angleToOpponentGoal + 60 * rand;
+            m_robot.Kick(100, kickAngle);
         }
 
         public override void play()
@@ -101,21 +115,18 @@ namespace player.Entities.Players
                             var me = GetCurrPlayer();
                             if (TurnTowards(new PointF(OpponentGoal.X, me.Pos.Value.Y)))
                             {
-                                Console.WriteLine("Goalie kick!");
+                                //Console.WriteLine("Goalie: kick!");
                                 m_robot.Kick(100, 0); // Kick horizontally towards the opponent goal
                                 m_playMode = "";
                             }
                         }
                     }
-                    if (m_playMode != FreeKickModeStr) 
+
+                    if (m_playMode != FreeKickModeStr)
                     {
                         if (!_init)
                         {
                             _init = MoveToPosition(StartingPosition, OpponentGoal);
-                            if (_init)
-                            {
-                                Console.WriteLine("Goalkeeper in position!");
-                            }
                         }
                         else
                         {
@@ -129,27 +140,50 @@ namespace player.Entities.Players
                             if (ballPos == null)
                             {
                             }
-                            else if (GetDistanceFrom(ballPos.Value) > 15.0) // If ball is far, turn to it
+                            else if (Utils.Distance(MyGoal, ballPos.Value) > 30.0) // If the ball is far, turn to it / return to goal
                             {
-                                TurnTowards(ballPos.Value);
+                                var me = GetCurrPlayer();
+                                // If we're far from the starting position (only on X axis), return to it
+                                if (Math.Abs(me.Pos.Value.X - StartingPosition.X) > DistanceThreshold)
+                                {
+                                    //Console.WriteLine("Goalie: returning to starting position");
+                                    MoveToPosition(StartingPosition, ballPos.Value);
+                                }
+                                else
+                                {
+                                    TurnTowards(ballPos.Value);
+                                }
                             }
-                            else if (GetDistanceFrom(ballPos.Value) > 1.7) // If ball is somewhat close, move forward
+                            else // If the ball is close, move forward to the ball / catch / kick
                             {
-                                // TODO: move to the ball! and catch if we're in the penalty box
-                            }
-                            else // The ball is very close -> catch
-                            {
-//                                var memoryBall = m_memory.GetSeenObject("ball");
-//                                double ballDirection = memoryBall.Direction.Value;
+                                var me = GetCurrPlayer();
                                 double ballDirection = CalcAngleToPoint(ballPos.Value);
-                                Console.WriteLine($"Catching in direction {ballDirection}");
-                                m_robot.Catch(ballDirection);
-                                // TODO: Determine if we catched the ball - this doesn't work well
-//                                if (ballPos.Value == LastBallPos) // then the catch probably succeed
-//                                {
-//                                    m_playMode = FreeKickModeStr;
-//                                }
-//                                LastBallPos = ballPos.Value;
+                                //  Catch only if we're in the penalty box and the ball is very close
+                                if (Math.Abs(me.Pos.Value.X - StartingPosition.X) < 12 &&
+                                    Math.Abs(me.Pos.Value.Y - StartingPosition.Y) < 12 &&
+                                    GetDistanceFrom(ballPos.Value) < 1.7 &&
+                                    Math.Abs(ballDirection) < 60)
+                                {
+                                    //Console.WriteLine($"Catching in direction {ballDirection}");
+                                    var rand = RandomGenerator.NextDouble();
+                                    if (rand < 0.75)
+                                    {
+                                        m_robot.Catch(ballDirection);
+                                    }
+                                    else
+                                    {
+                                        // Kick toward the opponent goal, but pick the exact angle randomly
+                                        KickToOppGoal();
+                                    } 
+                                }
+                                else
+                                {
+                                    // Move to the ball and kick
+                                    if (MoveToPosition(ballPos.Value, null, approximate:true))
+                                    {
+                                        KickToOppGoal();
+                                    }
+                                }
                             }
                         }
                     }
@@ -172,7 +206,6 @@ namespace player.Entities.Players
             }
         }
 
-        private PointF LastBallPos { get; set; }
         private PointF FreeKickPos { get; set; }
         private string FreeKickModeStr { get; set; }
     }

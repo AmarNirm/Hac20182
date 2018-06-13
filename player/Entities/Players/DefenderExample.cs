@@ -32,7 +32,7 @@ namespace RoboCup
 
                 //Get current player's info:
                 var bodyInfo = GetBodyInfo();
-                Console.WriteLine($"Kicks so far : {bodyInfo.Kick}");
+                //Console.WriteLine($"Kicks so far : {bodyInfo.Kick}");
 
                 while (ball == null || ball.Distance > 1.5)
                 {
@@ -40,7 +40,7 @@ namespace RoboCup
                     var ballPosByCoach = m_coach.GetSeenCoachObject("ball");
                     if (ballPosByCoach != null && ballPosByCoach.Pos != null)
                     {
-                        Console.WriteLine($"Ball Position {ballPosByCoach.Pos.Value.X}, {ballPosByCoach.Pos.Value.Y}");
+                        //Console.WriteLine($"Ball Position {ballPosByCoach.Pos.Value.X}, {ballPosByCoach.Pos.Value.Y}");
                     }
 
                     m_memory.waitForNewInfo();

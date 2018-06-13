@@ -113,12 +113,14 @@ namespace RoboCup
         /// </summary>
         /// <param name="targetPos"></param>
         /// <param name="targetTowards"></param>
+        /// <param name="approximate">If the distance threshold should be bigger</param>
         /// <returns>true if got into the required position (including angle)</returns>
-        protected bool MoveToPosition(PointF targetPos, PointF? targetTowards)
+        protected bool MoveToPosition(PointF targetPos, PointF? targetTowards, bool approximate = false)
         {
+            var distanceThreshold = approximate ? DistanceThreshold + 0.8 : DistanceThreshold;
             float distance = GetDistanceFrom(targetPos);
             Debug.WriteLine($"distance to target = {distance}");
-            if (distance > DistanceThreshold)
+            if (distance > distanceThreshold)
             {
                 bool res = TurnTowards(targetPos);
                 if (res)
