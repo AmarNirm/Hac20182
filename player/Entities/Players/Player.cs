@@ -272,6 +272,13 @@ namespace RoboCup
             return Attacker.Pos.Value;
         }
 
+        protected void KickTowardsTeamMate(PointF TeamMatePos)
+        {
+            PointF targetPoint = TeamMatePos;
+            var angleToPoint = CalcAngleToPoint(targetPoint);
+            m_robot.Kick(100, angleToPoint);
+        }
+
         protected SeenCoachObject GetBall()
         {
             while (!m_timeOver)

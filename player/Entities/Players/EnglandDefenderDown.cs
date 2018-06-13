@@ -117,13 +117,6 @@ namespace RoboCup
             m_robot.Kick(100, angleToPoint);
         }
 
-        private void KickTowardsTeamMate(PointF TeamMatePos)
-        {
-            PointF targetPoint = TeamMatePos;
-            var angleToPoint = CalcAngleToPoint(targetPoint);
-            m_robot.Kick(100, angleToPoint);
-        }
-
         private void AdvanceToBall(SeenCoachObject ball)
         {
             float distanceToBall = GetDistanceFrom(ball.Pos.Value);
