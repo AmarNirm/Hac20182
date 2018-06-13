@@ -57,7 +57,7 @@ namespace RoboCup
                         m_robot.Turn(40);
                         m_memory.waitForNewInfo();
                     }
-                    else if (ball.Distance.Value > 1.5 && FindPlayerClosestToTheBall() == this.m_number)
+                    else if (ball.Distance.Value > 1.5 && FindDefenderClosestToTheBall() == this.m_number)
                     {
                         // If ball is too far then
                         // turn to ball or 
