@@ -47,5 +47,13 @@ namespace RoboCup.Infrastructure
             return (float)a;
         }
 
+        /// <summary>
+        /// Returns a random Boolean value.
+        /// </summary>
+        public static bool GetRandomBoolean()
+        {
+            return new Random().Next(100) % 2 == 0;
+        }
+
     }
 }
