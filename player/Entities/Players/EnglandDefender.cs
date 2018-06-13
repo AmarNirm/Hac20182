@@ -73,6 +73,24 @@ namespace RoboCup
                         m_robot.Kick(25, goal.Direction.Value);
                     }
                 }
+                else
+                {
+                    var ballInfoFromCoach = m_coach.GetSeenCoachObject("ball");
+                    if (ballInfoFromCoach == null)
+                    {
+                        // If you don't know where is ball then find it
+                        m_robot.Turn(40);
+                        m_memory.waitForNewInfo();
+                    }
+                    else
+                    {
+                        var CurPlayer = this.GetCurrPlayer();
+                        var NextPos = new PointF(CurPlayer.Pos.Value.X, ballInfoFromCoach.Pos.Value.Y);
+                        Console.WriteLine($"NextPos ");
+                        MoveToPosition(NextPos, OpponentGoal);
+                    }
+
+                }
                 /*         
                  *         var bodyInfo = GetBodyInfo();
 

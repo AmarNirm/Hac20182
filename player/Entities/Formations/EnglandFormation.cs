@@ -12,8 +12,9 @@ namespace RoboCup
         public List<Player> InitTeam(Team team, ICoach coach)
         {
             var players = new List<Player>();
-            //players.Add(new Goalkeeper(team, coach));
+            players.Add(new Goalkeeper(team, coach));
             players.Add(new EnglandAttacker(team, coach));
+            players.Add(new EnglandDefender(team, coach));
             return players;
         }
     }
