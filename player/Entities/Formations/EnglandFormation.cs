@@ -13,7 +13,8 @@ namespace RoboCup
         {
             var players = new List<Player>();
             players.Add(new Goalkeeper(team, coach));
-            players.Add(new NirAttacker(team, coach));
+            players.Add(new EnglandAttacker(team, coach));
+            players.Add(new EnglandDefender(team, coach));
             return players;
         }
     }
