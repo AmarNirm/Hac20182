@@ -23,7 +23,7 @@ namespace RoboCup
 
         public override void play()
         {
-            //Thread.Sleep(5000);
+            
             // first move to start position
             m_robot.Move(m_startPosition.X, m_startPosition.Y);
 
@@ -36,7 +36,7 @@ namespace RoboCup
                 {
                     ball = GetBall();
 
-                    if (GetDistanceFrom(ball.Pos.Value) <= 5.5)
+                    if (GetDistanceFrom(ball.Pos.Value) <= 9)
                     {
                         if (GetDistanceFrom(ball.Pos.Value) <= 1.5)
                         {
@@ -47,9 +47,9 @@ namespace RoboCup
                     }
                     else
                     {
+                        
                         AdvanceToStartPoint();
                     }
-
 
                     // sleep one step to ensure that we will not send
                     // two commands in one cycle.
@@ -73,9 +73,9 @@ namespace RoboCup
         {
             PointF upInitialPoint = new PointF(25, 9);
             if (m_side == 'l')
-                upInitialPoint.X = 29;
+                upInitialPoint.X = 25;
             else
-                upInitialPoint.X *= -29;
+                upInitialPoint.X = -25;
 
             MoveToPosition(upInitialPoint, null);
         }
