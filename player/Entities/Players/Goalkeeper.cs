@@ -21,7 +21,7 @@ namespace player.Entities.Players
         private const float GoalDistance = (float) 1.5;
 
         public Goalkeeper(Team team, ICoach coach)
-            : base(team, coach)
+            : base(team, coach, isGoalie:true)
         {
         }
 
@@ -90,7 +90,9 @@ namespace player.Entities.Players
             {
                 if (m_playMode == $"free_kick_{m_side}")
                 {
-                    m_robot.Move(2, 2); // move in the penalty box
+                    m_robot.Move(2, 7); // move in the penalty box
+                    // Kick horizontally
+                    // TODO: TurnTowards()
                     var me = GetCurrPlayer();
                     float myAngle = me.BodyAngle.Value;
                     float targetAngle = m_side == 'l' ? 0 : 180;
@@ -116,7 +118,8 @@ namespace player.Entities.Players
                     }
                     else
                     {
-                        var ball = m_memory.GetSeenObject("ball");
+                        //var ball = m_memory.GetSeenObject("ball");
+                        var ball = m_coach.GetSeenCoachObject("ball");
                         /*switch (CurrentState)
                         {
                             case GoalieState.TurnToBall:
@@ -145,29 +148,29 @@ namespace player.Entities.Players
                         var myObj = GetCurrPlayer();
                         
                         var goal = GetGoalPosition(false);*/
-                        if (ball == null)
+                        PointF? ballPos = null;
+                        if (ball?.Pos != null)
+                        {
+                            ballPos = ball.Pos.Value;
+                        }
+
+                        // TODO: look at ball
+                        if (ballPos == null)
                         {
                             CurrentState = GoalieState.TurnToBall;
                         }
-                        else if (ball.Distance.Value > 2.0) // If ball is far
+                        else if (GetDistanceFrom(ballPos.Value) > 15.0) // If ball is far
                         {
-                            /*var me = GetCurrPlayer();
-                            float myAngle = me.BodyAngle.Value;
-        
-                            var myY=me.Pos.Value.Y;
-                            var ballY = ball.Pos.Value.Y;
-                            // Turn to the ball and move on the goal line
-                            m_robot.Turn(ball.Direction.Value);
-                            if (myAngle)
-                            // Calculate how much to move
-        
-                            float distanceToMove = 0;
-                            m_robot.Dash(10 * distanceToMove);*/
+                            TurnTowards(ballPos.Value);
                         }
-                        else
+                        else if (GetDistanceFrom(ballPos.Value) > 1.7) // If ball is close
                         {
-                            // The ball is close -> catch
-                            double ballDirection = ball.Direction ?? 0;
+                            // TODO: move to the ball! and catch if we're in the penalty box
+                        }
+                        else // The ball is very close -> catch
+                        {
+                            double ballDirection = CalcAngleToPoint(ballPos.Value);
+                            Console.WriteLine($"Catching in direction {ballDirection}");
                             m_robot.Catch(ballDirection);
                         }
                     }

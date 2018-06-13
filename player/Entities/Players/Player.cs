@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using RoboCup;
@@ -32,13 +33,15 @@ namespace RoboCup
         public Team m_team;
         public ICoach m_coach;
 
-        public Player(Team team, ICoach coach)
+        public Player(Team team, ICoach coach, bool isGoalie = false)
         {
             m_coach = coach;
             m_memory = new Memory();
             m_team = team;
             m_robot = new Robot(m_memory);
-            m_robot.Init(team.m_teamName, out m_side, out m_number, out m_playMode);
+
+            var teamName = isGoalie ? m_team.m_teamName + " (version 6) (goalie)" : m_team.m_teamName;
+            m_robot.Init(teamName, out m_side, out m_number, out m_playMode);
 
             Console.WriteLine("New Player - Team: " + m_team.m_teamName + " Side:" + m_side + " Num:" + m_number);
 
@@ -110,36 +113,26 @@ namespace RoboCup
         /// <param name="targetPos"></param>
         /// <param name="targetTowards"></param>
         /// <returns>true if got into the required position (including angle)</returns>
-        protected bool MoveToPosition(PointF targetPos, PointF targetTowards)
+        protected bool MoveToPosition(PointF targetPos, PointF? targetTowards)
         {
             float distance = GetDistanceFrom(targetPos);
             Debug.WriteLine($"distance to target = {distance}");
             if (distance > DistanceThreshold)
             {
-                float relAngle = CalcAngleToPoint(targetPos);
-                if (Math.Abs(relAngle) >= AngleThreshold)
-                {
-                    Console.WriteLine($"Player at side={m_side}, num={m_number} is turning {relAngle} degrees");
-                    m_robot.Turn(relAngle);
-                }
-                else
+                bool res = TurnTowards(targetPos);
+                if (res)
                 {
                     // Slow down a bit when approaching the target
-                    Console.WriteLine($"Player at side={m_side}, num={m_number} is dashing to {targetPos}");
+                    Debug.WriteLine($"Player at side={m_side}, num={m_number} is dashing to {targetPos}");
                     m_robot.Dash(70 * distance);
                 }
             }
             else // Already got to the position, now just need to turn
             {
-                if (targetTowards != null)
+                if (targetTowards.HasValue)
                 {
-                    float relAngle = CalcAngleToPoint(targetTowards);
-                    if (Math.Abs(relAngle) >= AngleThreshold)
-                    {
-                        Console.WriteLine($"Player at side={m_side}, num={m_number} is turning {relAngle} degrees");
-                        m_robot.Turn(relAngle);
-                    }
-                    else
+                    bool res = TurnTowards(targetTowards.Value);
+                    if (res)
                     {
                         return true;
                     }
@@ -148,6 +141,21 @@ namespace RoboCup
                 {
                     return true;
                 }
+            }
+            return false;
+        }
+
+        protected bool TurnTowards(PointF target)
+        {
+            float relAngle = CalcAngleToPoint(target);
+            if (Math.Abs(relAngle) >= AngleThreshold)
+            {
+                Debug.WriteLine($"Player at side={m_side}, num={m_number} is turning {relAngle} degrees");
+                m_robot.Turn(relAngle);
+            }
+            else
+            {
+                return true;
             }
             return false;
         }
@@ -164,10 +172,6 @@ namespace RoboCup
             float alphaPlayerToTargetRad = (float)Math.Atan(deltaY / deltaX);
             float alphaPlayerToTarget = Utils.RadToDeg(alphaPlayerToTargetRad);
             float relAngle = 0;
-            //if (Math.Abs(deltaY) < 0.1)
-            //{
-            //    relAngle = -myAngle;
-            //}
             if ((deltaY > 0 && deltaX > 0) || (deltaY < 0 && deltaX > 0)) // alpha > 0
             {
                 relAngle = -myAngle + alphaPlayerToTarget;
