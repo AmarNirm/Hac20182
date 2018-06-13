@@ -275,7 +275,7 @@ namespace RoboCup
                 }
                 else
                 {
-                    Console.WriteLine($"ball: {ball.Pos.Value.X},{ball.Pos.Value.Y}");
+                    //Console.WriteLine($"ball: {ball.Pos.Value.X},{ball.Pos.Value.Y}");
                     return ball;
                 }
             }
@@ -300,7 +300,7 @@ namespace RoboCup
             return null;
         }
 
-        private PointF? GetGoalPosition(bool mine)
+        protected PointF? GetGoalPosition(bool mine)
         {
             char targetGoal;
             if (mine)
