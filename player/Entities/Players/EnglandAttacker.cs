@@ -10,11 +10,11 @@ using RoboCup.Infrastructure;
 
 namespace RoboCup
 {
-    public class NirAttacker : Player
+    public class EnglandAttacker : Player
     {
         private const int WAIT_FOR_MSG_TIME = 10;
 
-        public NirAttacker(Team team, ICoach coach)
+        public EnglandAttacker(Team team, ICoach coach)
             : base(team, coach)
         {
             m_startPosition = new PointF(m_sideFactor * 10, 0);
@@ -30,13 +30,11 @@ namespace RoboCup
 
             while (!m_timeOver)
             {
-                var bodyInfo = GetBodyInfo();
-
                 obj = m_memory.GetSeenObject("ball");
                 if (obj == null)
                 {
                     // If you don't know where is ball then find it
-                    m_robot.Turn(40);
+                    m_robot.Turn(-40);
                     m_memory.waitForNewInfo();
                 }
                 else if (obj.Distance.Value > 1.5)
@@ -47,7 +45,7 @@ namespace RoboCup
                     if (obj.Direction.Value != 0)
                         m_robot.Turn(obj.Direction.Value);
                     else
-                        m_robot.Dash(10 * obj.Distance.Value);
+                        m_robot.Dash(100);
                 }
                 else
                 {
@@ -83,7 +81,7 @@ namespace RoboCup
 
                 if (obj == null)
                 {
-                    m_robot.Turn(40);
+                    m_robot.Turn(-40);
                     m_memory.waitForNewInfo();
                 }
                 else

@@ -94,7 +94,7 @@
     <Compile Include="Entities\Players\Midfielders\WideMidfielders.cs" />
     <Compile Include="Entities\Players\DefenderExample.cs" />
     <Compile Include="Entities\Players\AttackerExample.cs" />
-    <Compile Include="Entities\Players\NirAttacker.cs" />
+    <Compile Include="Entities\Players\EnglandAttacker.cs" />
     <Compile Include="Entities\Team.cs" />
     <Compile Include="Infrastructure\FieldLocations.cs" />
     <Compile Include="Infrastructure\FlagNameToPointF.cs" />
