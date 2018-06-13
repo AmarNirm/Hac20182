@@ -25,77 +25,153 @@ namespace player.Entities.Players
         {
         }
 
-        public SeenCoachObject MyGoal { get; set; }
-
-        public override void play()
+        public enum GoalieState
         {
-            MyGoal = m_coach.GetSeenCoachObject(m_side == 'l' ? "goal l" : "goal r");
-            float start_pos_x;
-            if (MyGoal != null)
+            TurnToGoalLine,
+            MoveOnGoalLine,
+            TurnToBall
+        }
+        
+        private bool Init = false;
+
+        private PointF StartingPosition
+        {
+            get
             {
-                var goal_x = MyGoal.Pos.Value.X;
-                start_pos_x = goal_x > 0 ? goal_x - GoalDistance : goal_x + GoalDistance;
-                Console.WriteLine("Golie going to " + start_pos_x);
+                if (m_startPosition == null)
+                {
+                    CalcStartingPosition();
+                }
+                return m_startPosition;
+            }
+        }
+
+        private void TurnToBall()
+        {
+            var ball = m_memory.GetSeenObject("ball");
+            if (ball == null)
+            {
+                // If you don't know where is ball then find it
+                m_robot.Turn(40);
+                m_memory.waitForNewInfo();
             }
             else
             {
-                start_pos_x = m_side == 'l' ? -51:51;
-                Console.WriteLine("Golie going to " + start_pos_x);
-            }
-
-            m_startPosition = new PointF(start_pos_x, 0);
-            // first move to start position
-            // m_robot.Move(m_startPosition.X, m_startPosition.Y);
-
-            SeenObject obj;
-
-            while (!m_timeOver)
-            {
-                //m_robot.Move(m_startPosition.X, m_startPosition.Y);
-                var myObj = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {m_number}");
-                if (myObj != null)
+                // turn to ball
+                if (ball.Direction.Value > 0.05)
                 {
-                    Console.WriteLine(myObj.BodyAngle);
-                    m_robot.Turn(45);
-                    Console.WriteLine(myObj.BodyAngle);
-                }
-                
-                //var bodyInfo = GetBodyInfo();
-
-                //obj = m_memory.GetSeenObject("ball");
-                /*if (obj == null)
-                {
-                    // If you don't know where is ball then find it
-                    m_robot.Turn(40);
-                    m_memory.waitForNewInfo();
-                }
-                else if (obj.Distance.Value > 1.5)
-                {
-                    // If ball is too far then
-                    // turn to ball or 
-                    // if we have correct direction then go to ball
-                    if (obj.Direction.Value != 0)
-                        m_robot.Turn(obj.Direction.Value);
-                    else
-                        m_robot.Dash(10 * obj.Distance.Value);
+                    m_robot.Turn(ball.Direction.Value);
                 }
                 else
                 {
-                    // We know where is ball and we can kick it
-                    // so look for goal
-                    if (m_side == 'l')
-                        obj = m_memory.GetSeenObject("goal r");
-                    else
-                        obj = m_memory.GetSeenObject("goal l");
+                    Init = true;
+                }
+            }
+        }
 
-                    if (obj == null)
+        private PointF CalcStartingPosition()
+        {
+            float startPosX;
+            var goalX = MyGoal.X;
+            startPosX = goalX > 0 ? goalX - GoalDistance : goalX + GoalDistance;
+            m_startPosition = new PointF(startPosX, 0);
+            return m_startPosition;
+        }
+
+        public override void play()
+        {
+            CalcStartingPosition();
+            // first move to start position
+            m_robot.Move(m_startPosition.X, m_startPosition.Y);
+
+            CurrentState = GoalieState.TurnToBall;
+            
+            while (!m_timeOver)
+            {
+                if (m_playMode == $"free_kick_{m_side}")
+                {
+                    m_robot.Move(2, 2); // move in the penalty box
+                    var me = GetCurrPlayer();
+                    float myAngle = me.BodyAngle.Value;
+                    float targetAngle = m_side == 'l' ? 0 : 180;
+                    float angleDiff = targetAngle - myAngle;
+                    if (angleDiff < 0.1)
                     {
-                        m_robot.Turn(40);
-                        m_memory.waitForNewInfo();
+                        m_robot.Turn(angleDiff);
                     }
                     else
-                        m_robot.Kick(100, obj.Direction.Value);
-                }*/
+                    {
+                        m_robot.Kick(100, 0); // Kick horizontally towards the opponent goal
+                    }
+                }
+                else
+                {
+                    if (!Init)
+                    {
+                        Init = MoveToPosition(StartingPosition, OpponentGoal);
+                        if (Init)
+                        {
+                            Console.WriteLine("Goalkeeper in position!");
+                        }
+                    }
+                    else
+                    {
+                        var ball = m_memory.GetSeenObject("ball");
+                        /*switch (CurrentState)
+                        {
+                            case GoalieState.TurnToBall:
+                                if (ball == null)
+                                { // Look for the ball
+                                    m_robot.Turn(40);
+                                    m_memory.waitForNewInfo();
+                                }
+                                else
+                                {
+                                    // TODO: if the ball's direction is different
+                                    CurrentState = GoalieState.TurnToGoalLine;
+                                }
+                                break;
+                            case GoalieState.TurnToGoalLine:
+                                // TODO: turn
+                                var me = GetCurrPlayer();
+                                float myAngle = me.BodyAngle.Value;
+                                float ballLastY = 0;
+                                //if (ballLastY)
+                                break;
+                            case GoalieState.MoveOnGoalLine:
+                                break;
+                        }
+        
+                        var myObj = GetCurrPlayer();
+                        
+                        var goal = GetGoalPosition(false);*/
+                        if (ball == null)
+                        {
+                            CurrentState = GoalieState.TurnToBall;
+                        }
+                        else if (ball.Distance.Value > 2.0) // If ball is far
+                        {
+                            /*var me = GetCurrPlayer();
+                            float myAngle = me.BodyAngle.Value;
+        
+                            var myY=me.Pos.Value.Y;
+                            var ballY = ball.Pos.Value.Y;
+                            // Turn to the ball and move on the goal line
+                            m_robot.Turn(ball.Direction.Value);
+                            if (myAngle)
+                            // Calculate how much to move
+        
+                            float distanceToMove = 0;
+                            m_robot.Dash(10 * distanceToMove);*/
+                        }
+                        else
+                        {
+                            // The ball is close -> catch
+                            double ballDirection = ball.Direction ?? 0;
+                            m_robot.Catch(ballDirection);
+                        }
+                    }
+                }
 
                 // sleep one step to ensure that we will not send
                 // two commands in one cycle.
@@ -109,6 +185,8 @@ namespace player.Entities.Players
                 }
             }
         }
+
+        public GoalieState CurrentState { get; set; }
 
         private SenseBodyInfo GetBodyInfo()
         {
