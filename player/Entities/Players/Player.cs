@@ -5,6 +5,7 @@ using RoboCup;
 using RoboCup.Entities;
 using RoboCup.Infrastructure;
 using System.Linq;
+using System.Diagnostics;
 
 namespace RoboCup
 {
@@ -337,7 +338,8 @@ namespace RoboCup
                     Double BallX = ballPosByCoach.Pos.Value.X;
                     Double BallY = ballPosByCoach.Pos.Value.Y;
 
-                    objPlayer = m_coach.GetSeenCoachObject(player + m_team.m_teamName + " " + playerListNum.ToString());
+                    //objPlayer = m_coach.GetSeenCoachObject(player + m_team.m_teamName + " " + playerListNum.ToString());
+                    objPlayer = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {playerListNum}");
                     Double PlayerX = objPlayer.Pos.Value.X;
                     Double PlayerY = objPlayer.Pos.Value.Y;
                     CurrentDistance = Math.Sqrt(Math.Pow(PlayerX - BallX, 2) + Math.Pow(PlayerY - BallY, 2));
