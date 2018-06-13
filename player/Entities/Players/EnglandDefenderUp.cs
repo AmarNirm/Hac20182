@@ -10,22 +10,22 @@ using RoboCup.Infrastructure;
 
 namespace RoboCup
 {
-    public class EnglandDefenderRight : Player
+    public class EnglandDefenderUp : Player
     {
         private const int WAIT_FOR_MSG_TIME = 10;
         private bool Init;
-        public EnglandDefenderRight(Team team, ICoach coach)
+        public EnglandDefenderUp(Team team, ICoach coach)
             : base(team, coach)
         {
-            if (m_side == 'l')
+            if(m_side=='l')
             {
-                m_startPosition.X = -32;
-                m_startPosition.Y = 10;
+                m_startPosition.X = -25;
+                m_startPosition.Y = -10;
             }
             else
             {
-                m_startPosition.X = 32;
-                m_startPosition.Y = 10;
+                m_startPosition.X = 25;
+                m_startPosition.Y = -10;
             }
         }
 
@@ -49,12 +49,20 @@ namespace RoboCup
                             Console.WriteLine("Defender in position!");
                         }
                     }
+
                     else if (IsBallInMyHalf())
                     {
                         ball = GetBall();
                         if (GetDistanceFrom(ball.Pos.Value) > 1.5)
                         {
-                            AdvanceToBall(ball);
+                            if (AmITheClosesDefenderToBall())
+                            {
+                                AdvanceToBall(ball);
+                            }
+                            else
+                            {
+                                
+                            }
                         }
                         else
                         {
@@ -65,7 +73,8 @@ namespace RoboCup
                     else
                     {
                         ball = GetBall();
-                        var nextPos = new PointF(m_startPosition.X, ball.Pos.Value.Y);
+                        var currPlayer = this.GetCurrPlayer();
+                        var nextPos = new PointF(currPlayer.Pos.Value.X, ball.Pos.Value.Y);
                         MoveToPosition(nextPos, OpponentGoal);
                     }
 
@@ -84,38 +93,6 @@ namespace RoboCup
                 {
                     Console.WriteLine("basa");
                 }
-            }
-        }
-
-        private void KickToGoal()
-        {
-            PointF targetPoint = OpponentGoal;
-            if (Utils.GetRandomBoolean())
-                targetPoint.Y += 3F;
-            else
-                targetPoint.Y -= 3F;
-
-            var angleToPoint = CalcAngleToPoint(targetPoint);
-            m_robot.Kick(100, angleToPoint);
-        }
-
-        private void AdvanceToBall(SeenCoachObject ball)
-        {
-            float distanceToBall = GetDistanceFrom(ball.Pos.Value);
-            float directionToBall = CalcAngleToPoint(ball.Pos.Value);
-            bool isDirectionZero = Math.Abs(directionToBall) < 1;
-
-            // If ball is too far then
-            // turn to ball or 
-            // if we have correct direction then go to ball
-            if ((distanceToBall >= 6 && !isDirectionZero) ||
-                (distanceToBall < 6 && Math.Abs(directionToBall) > 10))
-            {
-                m_robot.Turn(directionToBall);
-            }
-            else
-            {
-                m_robot.Dash(100);
             }
         }
 
@@ -180,6 +157,43 @@ namespace RoboCup
                 onDefenderSide = ball.Pos.Value.X >= -5;
 
             return onDefenderSide;
+        }
+
+        private void KickToGoal()
+        {
+            PointF targetPoint = OpponentGoal;
+            if (Utils.GetRandomBoolean())
+                targetPoint.Y += 3F;
+            else
+                targetPoint.Y -= 3F;
+
+            var angleToPoint = CalcAngleToPoint(targetPoint);
+            m_robot.Kick(100, angleToPoint);
+        }
+
+        private void AdvanceToBall(SeenCoachObject ball)
+        {
+            float distanceToBall = GetDistanceFrom(ball.Pos.Value);
+            float directionToBall = CalcAngleToPoint(ball.Pos.Value);
+            bool isDirectionZero = Math.Abs(directionToBall) < 1;
+
+            // If ball is too far then
+            // turn to ball or 
+            // if we have correct direction then go to ball
+            if ((distanceToBall >= 6 && !isDirectionZero) ||
+                (distanceToBall < 6 && Math.Abs(directionToBall) > 10))
+            {
+                m_robot.Turn(directionToBall);
+            }
+            else
+            {
+                m_robot.Dash(100);
+            }
+        }
+
+        public bool AmITheClosesDefenderToBall()
+        {
+            return FindDefenderClosestToTheBall() == this.m_number;
         }
 
     }
