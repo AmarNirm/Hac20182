@@ -10,22 +10,22 @@ using RoboCup.Infrastructure;
 
 namespace RoboCup
 {
-    public class EnglandDefenderLeft : Player
+    public class EnglandDefenderRight : Player
     {
         private const int WAIT_FOR_MSG_TIME = 10;
         private bool Init;
-        public EnglandDefenderLeft(Team team, ICoach coach)
+        public EnglandDefenderRight(Team team, ICoach coach)
             : base(team, coach)
         {
-            if(m_side=='l')
+            if (m_side == 'l')
             {
                 m_startPosition.X = -25;
-                m_startPosition.Y = -10;
+                m_startPosition.Y = 10;
             }
             else
             {
                 m_startPosition.X = 25;
-                m_startPosition.Y = -10;
+                m_startPosition.Y = 10;
             }
         }
 
@@ -48,7 +48,7 @@ namespace RoboCup
                     }
                 }
 
-                if(IsBallInMyHalf())
+                if (IsBallInMyHalf())
                 {
                     ball = m_memory.GetSeenObject("ball");
                     if (ball == null)
@@ -90,7 +90,7 @@ namespace RoboCup
                         //var NextPos = new PointF(CurPlayer.Pos.Value.X, 10);
                         //Console.WriteLine($"NextPos.X={NextPos.X}, NextPos.Y={NextPos.Y}");
                         MoveToPosition(NextPos, OpponentGoal);
-                       
+
                     }
 
                 }
@@ -178,5 +178,5 @@ namespace RoboCup
             return BallInMyHalf;
         }
 
-     }
+    }
 }

@@ -82,6 +82,7 @@
     <Compile Include="Entities\Players\Defenders\Sweeper.cs" />
     <Compile Include="Entities\Players\Defenders\WingBack.cs" />
     <Compile Include="Entities\Players\EnglandAttacker.cs" />
+    <Compile Include="Entities\Players\EnglandDefenderRight.cs" />
     <Compile Include="Entities\Players\Forwards\Forward.cs" />
     <Compile Include="Entities\Players\Forwards\Striker.cs" />
     <Compile Include="Entities\Players\Forwards\WithdrawnStriker.cs" />
