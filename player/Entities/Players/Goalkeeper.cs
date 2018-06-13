@@ -89,7 +89,7 @@ namespace player.Entities.Players
                 {
                     if (m_playMode == FreeKickModeStr)
                     {
-                        // TODO: not tested completely
+                        // not tested completely
                         /*var ball = m_coach.GetSeenCoachObject("ball");
                         if (ball?.Pos != null)
                         {
@@ -121,8 +121,7 @@ namespace player.Entities.Players
                             }
                         }
                     }
-
-                    if (m_playMode != FreeKickModeStr)
+                    else
                     {
                         if (!_init)
                         {
@@ -140,7 +139,7 @@ namespace player.Entities.Players
                             if (ballPos == null)
                             {
                             }
-                            else if (Utils.Distance(MyGoal, ballPos.Value) > 30.0) // If the ball is far, turn to it / return to goal
+                            else if (Utils.Distance(MyGoal, ballPos.Value) > 22.0) // If the ball is far from the goal, turn to it / return to goal
                             {
                                 var me = GetCurrPlayer();
                                 // If we're far from the starting position (only on X axis), return to it
@@ -151,10 +150,37 @@ namespace player.Entities.Players
                                 }
                                 else
                                 {
-                                    TurnTowards(ballPos.Value);
+                                    if (MovingOnGoalLine) // Finish walking
+                                    {
+                                        if (MoveToPosition(new PointF(StartingPosition.X, TargetY), ballPos.Value))
+                                        {
+                                            //Console.WriteLine("Goalie: finished moving");
+                                            MovingOnGoalLine = false;
+                                        }
+                                    }
+                                    else if (TurnTowards(ballPos.Value))
+                                    {
+                                        // Check if we should move on the goal line
+                                        var myAngleAbs = Math.Abs(me.BodyAngle.Value);
+                                        // The absolute angle to the ball can be between 90 and 180 (in case of side=r), so move to [0,90] and normalize:
+                                        // [0, 1] when 0=straight, 1=90 degrees (vertical)
+                                        var myAngleNorm = (m_side == 'r') ? (180 - myAngleAbs) / 90 : myAngleAbs / 90;
+                                        if (myAngleNorm * ballPos.Value.Y < 0)
+                                        {
+                                            myAngleNorm *= -1;
+                                        }
+                                        myAngleNorm *= 0.8f; // decrease the norm, because we prefer to stay close to the center of the goal
+                                        TargetY = HalfGoalLength * myAngleNorm;
+                                        if (Math.Abs(me.Pos.Value.Y - TargetY) > 0.7)
+                                        {
+                                            //Console.WriteLine("Goalie: moving to y=" + TargetY);
+                                            MovingOnGoalLine = true;
+                                            MoveToPosition(new PointF(StartingPosition.X, TargetY), ballPos.Value);
+                                        }
+                                    }
                                 }
                             }
-                            else // If the ball is close, move forward to the ball / catch / kick
+                            else // The ball is close to the goal -> move forward to the ball / catch / kick
                             {
                                 var me = GetCurrPlayer();
                                 double ballDirection = CalcAngleToPoint(ballPos.Value);
@@ -162,11 +188,11 @@ namespace player.Entities.Players
                                 if (Math.Abs(me.Pos.Value.X - StartingPosition.X) < 12 &&
                                     Math.Abs(me.Pos.Value.Y - StartingPosition.Y) < 12 &&
                                     GetDistanceFrom(ballPos.Value) < 1.7 &&
-                                    Math.Abs(ballDirection) < 60)
+                                    Math.Abs(ballDirection) < 90)
                                 {
                                     //Console.WriteLine($"Catching in direction {ballDirection}");
                                     var rand = RandomGenerator.NextDouble();
-                                    if (rand < 0.75)
+                                    if (rand < 0.50)
                                     {
                                         m_robot.Catch(ballDirection);
                                     }
@@ -174,12 +200,12 @@ namespace player.Entities.Players
                                     {
                                         // Kick toward the opponent goal, but pick the exact angle randomly
                                         KickToOppGoal();
-                                    } 
+                                    }
                                 }
                                 else
                                 {
                                     // Move to the ball and kick
-                                    if (MoveToPosition(ballPos.Value, null, approximate:true))
+                                    if (MoveToPosition(ballPos.Value, null, approximate: true))
                                     {
                                         KickToOppGoal();
                                     }
@@ -208,5 +234,9 @@ namespace player.Entities.Players
 
         private PointF FreeKickPos { get; set; }
         private string FreeKickModeStr { get; set; }
+        public bool MovingOnGoalLine { get; private set; }
+        public float TargetY { get; private set; }
+
+        private float HalfGoalLength = 7;
     }
 }

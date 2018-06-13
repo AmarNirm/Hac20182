@@ -305,7 +305,6 @@ namespace RoboCup
                 var currPlayer = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {m_number}");
                 if (currPlayer == null)
                 {
-                    Console.WriteLine("currPlayer == null");
                     continue;
                 }
                 else
