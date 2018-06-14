@@ -18,25 +18,26 @@ namespace RoboCup
         public EnglandAttackerFront(Team team, ICoach coach)
             : base(team, coach)
         {
-            m_startPosition = new PointF(m_sideFactor * 10, 0);
+            if(m_side == 'l')
+                m_startPosition = new PointF(-25, 9);
+            else
+                m_startPosition = new PointF(25, 9);
         }
 
         public override void play()
         {
-            bool Init = false;
-            // first move to start position
-            m_robot.Move(m_startPosition.X, m_startPosition.Y);
-            //while(!Init)
-            //    Init = AdvanceToStartPoint();
-
-            
             SeenCoachObject ball;
             PointF? goal;
-
+            //after gaol, first move to start position
+           
+           
             while (!m_timeOver)
             {
                 try
                 {
+                    //go to initial position only after goal or free kick
+                    m_robot.Move(m_startPosition.X, m_startPosition.Y);
+
                     ball = GetBall();
 
                     //if (GetDistanceFrom(ball.Pos.Value) <= 9)
@@ -73,10 +74,16 @@ namespace RoboCup
             }
         }
 
-        public int GoToOtherWing()
+        public void GoToOtherWing()
         {
-            return 1;
+            PointF OtherAttacker = FindAttackerPosition();
+            
+            if(OtherAttacker.Y >= 5)
+                MoveToPosition(new PointF(m_startPosition.X, m_startPosition.Y*-1), null);
+            else if (OtherAttacker.Y <= -5)
+                MoveToPosition(m_startPosition, null);
         }
+
 
         private void AdvanceToStartPoint()
         {
