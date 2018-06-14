@@ -120,7 +120,8 @@ namespace RoboCup
 
                 var OtherAttacker = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {OtherAttackerNumber}");
                 var Me = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {m_number}");
-                if (Math.Abs(OtherAttacker.Pos.Value.X) - Math.Abs(Me.Pos.Value.X) > 10)
+                var range = Math.Abs(OtherAttacker.Pos.Value.X) - Math.Abs(Me.Pos.Value.X);
+                if (range > 10 && range <= 35)
                     Kick(OtherAttacker.Pos.Value);
                 else
                     Kick(goal.Value, 20);
