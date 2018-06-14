@@ -428,7 +428,7 @@ namespace RoboCup
             lock (thisLock)
             {
 
-                for (int i = 3; i < PlayersList.Count; i++)
+                for (int i = 2; i < 4; i++)
                 {
                     playerListNum = i + 1;
                     Player = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {playerListNum}");
@@ -442,10 +442,10 @@ namespace RoboCup
                     Double PlayerX = Player.Pos.Value.X;
                     Double PlayerY = Player.Pos.Value.Y;
                     CurrentDistance = Math.Sqrt(Math.Pow(PlayerX - BallX, 2) + Math.Pow(PlayerY - BallY, 2));
-                    if (i == 3)
+                    if (i == 2)
                     {
                         Distance = CurrentDistance;
-                        ClosestPlayerToTheBall = 4;
+                        ClosestPlayerToTheBall = 3;
                     }
                     else if (CurrentDistance < Distance)
                     {
@@ -480,7 +480,7 @@ namespace RoboCup
             lock (thisLock)
             {
 
-                for (int i = 1; i < 3; i++)
+                for (int i = 0; i < 2; i++)
                 {
                     playerListNum = i + 1;
                     Player = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {playerListNum}");
@@ -494,10 +494,10 @@ namespace RoboCup
                     Double PlayerX = Player.Pos.Value.X;
                     Double PlayerY = Player.Pos.Value.Y;
                     CurrentDistance = Math.Sqrt(Math.Pow(PlayerX - BallX, 2) + Math.Pow(PlayerY - BallY, 2));
-                    if (i == 1)
+                    if (i == 0)
                     {
                         Distance = CurrentDistance;
-                        ClosestPlayerToTheBall = 2;
+                        ClosestPlayerToTheBall = 1;
                     }
                     else if (CurrentDistance < Distance)
                     {

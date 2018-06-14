@@ -29,7 +29,7 @@ namespace RoboCup
             SeenCoachObject ball;
             PointF? goal;
             //after gaol, first move to start position
-
+            PointF halfPlace = new PointF(0,0);
 
             while (!m_timeOver)
             {
@@ -38,22 +38,36 @@ namespace RoboCup
                     //go to initial position only after goal or free kick
                     m_robot.Move(m_startPosition.X, m_startPosition.Y);
 
+                    SeenCoachObject currPlayer = GetCurrPlayer();
+                    bool onAttackHalf = false;
                     ball = GetBall();
 
-                    //if (GetDistanceFrom(ball.Pos.Value) <= 9)
-                    if (FindAtackerClosestToTheBall() == m_number)
+                    if (m_side == 'l')
+                        onAttackHalf = currPlayer.Pos.Value.X >= -5; // -5
+                    else
+                        onAttackHalf = currPlayer.Pos.Value.X <= 5; // 5
+
+                    if (onAttackHalf)
                     {
-                        if (GetDistanceFrom(ball.Pos.Value) <= 1.5)
+                        //if (GetDistanceFrom(ball.Pos.Value) <= 9)
+                        if (FindAtackerClosestToTheBall() == m_number)
                         {
-                            goal = GetGoalPosition(false);
-                            KickToGoal(goal);
+                            if (GetDistanceFrom(ball.Pos.Value) <= 1.5)
+                            {
+                                goal = GetGoalPosition(false);
+                                KickToGoal(goal);
+                            }
+                            MoveToPosition(ball.Pos.Value, null);
                         }
-                        MoveToPosition(ball.Pos.Value, null);
+                        else
+                        {
+                            //AdvanceToStartPoint();
+                            GoToOtherWing();
+                        }
                     }
                     else
                     {
-                        //AdvanceToStartPoint();
-                        GoToOtherWing();
+                        MoveToPosition(halfPlace, null);
                     }
 
                     // sleep one step to ensure that we will not send
@@ -77,12 +91,13 @@ namespace RoboCup
         public void GoToOtherWing()
         {
             PointF OtherAttacker = FindAttackerPosition();
+            var targetTowards = GetBall().Pos.Value;
 
 
             if (OtherAttacker.Y >= 5)
-                MoveToPosition(new PointF(m_startPosition.X, m_startPosition.Y * -1), null);
+                MoveToPosition(new PointF(m_startPosition.X, m_startPosition.Y * -1), targetTowards);
             else
-                MoveToPosition(m_startPosition, null);
+                MoveToPosition(m_startPosition, targetTowards);
         }
 
 
@@ -105,7 +120,7 @@ namespace RoboCup
             else
                 targetPoint.Y -= 3F;
 
-            if (GetDistanceFrom(targetPoint) < 25)
+            if (GetDistanceFrom(targetPoint) < 20)
             {
                 Kick(targetPoint);
             }
@@ -121,7 +136,7 @@ namespace RoboCup
                 var OtherAttacker = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {OtherAttackerNumber}");
                 var Me = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {m_number}");
                 var range = Math.Abs(OtherAttacker.Pos.Value.X) - Math.Abs(Me.Pos.Value.X);
-                if (range > 10 && range <= 35 && Math.Abs(OtherAttacker.Pos.Value.X) > Math.Abs(Me.Pos.Value.X))
+                if (range > 10 && range <= 25 && Math.Abs(OtherAttacker.Pos.Value.X) > Math.Abs(Me.Pos.Value.X))
                     Kick(OtherAttacker.Pos.Value);
                 else
                     Kick(goal.Value, 20);
