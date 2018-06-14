@@ -52,6 +52,7 @@ namespace RoboCup
 
                     if (IsBallInMyHalf())
                     {
+
                         ball = GetBall();
                         if (GetDistanceFrom(ball.Pos.Value) > 1.5)
                         {
@@ -77,7 +78,11 @@ namespace RoboCup
                         else
                         {
                             //KickToGoal();
-                            KickTowardsTeamMate(FindAttackerPosition());
+                            //if distance is too far for the ball to reach the attacker
+                            if(GetDistanceFrom(FindAttackerPosition())>28)
+                                m_robot.Kick(20, CalcAngleToPoint(FindAttackerPosition()));
+                            else
+                                KickTowardsTeamMate(FindAttackerPosition());
                         }
                     }
                     else

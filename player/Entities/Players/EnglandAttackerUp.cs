@@ -127,7 +127,7 @@ namespace RoboCup
             }
             else
             {
-                //check is it better to pass than dribel
+                //check if it is better to pass than dribel
                 int OtherAttackerNumber;
                 if (m_number == 2)
                     OtherAttackerNumber = 3;

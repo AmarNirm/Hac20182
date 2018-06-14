@@ -76,8 +76,12 @@ namespace RoboCup
                         }
                         else
                         {
-                            KickTowardsTeamMate(FindAttackerPosition());
                             //KickToGoal();
+                            //if distance is too far for the ball to reach the attacker
+                            if (GetDistanceFrom(FindAttackerPosition()) > 28)
+                                m_robot.Kick(20, CalcAngleToPoint(FindAttackerPosition()));
+                            else //if(CalcAngleToPoint(FindAttackerPosition())>=)
+                                KickTowardsTeamMate(FindAttackerPosition());
                         }
                     }
                     else
