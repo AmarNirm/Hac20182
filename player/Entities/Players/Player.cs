@@ -129,11 +129,11 @@ namespace RoboCup
                 Console.WriteLine("Ball behind: correcting target");
                 if (myPos.Y > targetPos.Y)
                 {
-                    targetPos.Y += 2;
+                    targetPos.Y += 1;
                 }
                 else
                 {
-                    targetPos.Y -= 2;
+                    targetPos.Y -= 1;
                 }
             }
 
@@ -180,15 +180,10 @@ namespace RoboCup
             float relAngle = CalcAngleToPoint(target);
             float distanceToTarget = GetDistanceFrom(target);
 
-            if ((distanceToTarget >= 6 && Math.Abs(relAngle) >= AngleThreshold) ||
-                (distanceToTarget < 6 && Math.Abs(relAngle) > 10))
+            //if ((distanceToTarget >= 6 && Math.Abs(relAngle) >= AngleThreshold) ||
+            //    (distanceToTarget < 6 && Math.Abs(relAngle) > 10))
+            if (Math.Abs(relAngle) > 3)
             {
-                m_robot.Turn(relAngle);
-            }
-
-            if (Math.Abs(relAngle) >= AngleThreshold)
-            {
-                Debug.WriteLine($"Player at side={m_side}, num={m_number} is turning {relAngle} degrees");
                 m_robot.Turn(relAngle);
             }
             else
@@ -480,6 +475,6 @@ namespace RoboCup
         }
 
         protected float DistanceThreshold = 0.4f;
-        protected float AngleThreshold = 1f;
+        protected float AngleThreshold = 3f;
     }
 }
