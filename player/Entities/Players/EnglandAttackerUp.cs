@@ -79,9 +79,9 @@ namespace RoboCup
 
         private void AdvanceToStartPoint()
         {
-            PointF upInitialPoint = new PointF(26, -20);
+            PointF upInitialPoint = new PointF(10, -20);
             if (m_side == 'l')
-                upInitialPoint.X = 26;
+                upInitialPoint.X = 10;
             else
                 upInitialPoint.X *= -1;
 
