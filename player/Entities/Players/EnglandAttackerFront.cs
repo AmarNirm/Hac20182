@@ -23,10 +23,13 @@ namespace RoboCup
 
         public override void play()
         {
-            
+            bool Init = false;
             // first move to start position
             m_robot.Move(m_startPosition.X, m_startPosition.Y);
+            //while(!Init)
+            //    Init = AdvanceToStartPoint();
 
+            
             SeenCoachObject ball;
             PointF? goal;
 
@@ -36,7 +39,8 @@ namespace RoboCup
                 {
                     ball = GetBall();
 
-                    if (GetDistanceFrom(ball.Pos.Value) <= 9)
+                    //if (GetDistanceFrom(ball.Pos.Value) <= 9)
+                    if(FindAtackerClosestToTheBall()==m_number)
                     {
                         if (GetDistanceFrom(ball.Pos.Value) <= 1.5)
                         {
@@ -47,8 +51,8 @@ namespace RoboCup
                     }
                     else
                     {
-                        
-                        AdvanceToStartPoint();
+                        //AdvanceToStartPoint();
+                        GoToOtherWing();
                     }
 
                     // sleep one step to ensure that we will not send
@@ -67,6 +71,11 @@ namespace RoboCup
                     Console.WriteLine("basa");
                 }
             }
+        }
+
+        public int GoToOtherWing()
+        {
+            return 1;
         }
 
         private void AdvanceToStartPoint()
