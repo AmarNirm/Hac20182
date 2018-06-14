@@ -57,7 +57,7 @@ namespace RoboCup
                         {
                             if (AmITheClosesDefenderToBall())
                             {
-                                AdvanceToBall(ball);
+                                MoveToPosition(ball.Pos.Value, null);
                             }
                             else
                             {
