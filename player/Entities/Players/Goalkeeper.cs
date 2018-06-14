@@ -139,11 +139,12 @@ namespace player.Entities.Players
                             if (ballPos == null)
                             {
                             }
-                            else if (Utils.Distance(MyGoal, ballPos.Value) > 22.0) // If the ball is far from the goal, turn to it / return to goal
+                            else if (Utils.Distance(MyGoal, ballPos.Value) > 22.0
+                            ) // If the ball is far from the goal, turn to it / return to goal
                             {
                                 var me = GetCurrPlayer();
                                 // If we're far from the starting position (only on X axis), return to it
-                                if (Math.Abs(me.Pos.Value.X - StartingPosition.X) > DistanceThreshold)
+                                if (Math.Abs(me.Pos.Value.X - StartingPosition.X) > DistanceThreshold + 0.2)
                                 {
                                     //Console.WriteLine("Goalie: returning to starting position");
                                     MoveToPosition(StartingPosition, ballPos.Value, fast: false);
@@ -152,7 +153,8 @@ namespace player.Entities.Players
                                 {
                                     if (MovingOnGoalLine) // Finish walking
                                     {
-                                        if (MoveToPosition(new PointF(StartingPosition.X, TargetY), ballPos.Value))
+                                        if (MoveToPosition(new PointF(StartingPosition.X, TargetY), ballPos.Value,
+                                            fast: false))
                                         {
                                             //Console.WriteLine("Goalie: finished moving");
                                             MovingOnGoalLine = false;
@@ -169,13 +171,16 @@ namespace player.Entities.Players
                                         {
                                             myAngleNorm *= -1;
                                         }
-                                        myAngleNorm *= 0.8f; // decrease the norm, because we prefer to stay close to the center of the goal
+
+                                        // decrease the norm, because we prefer to stay close to the center of the goal
+                                        myAngleNorm *= 0.8f;
                                         TargetY = HalfGoalLength * myAngleNorm;
                                         if (Math.Abs(me.Pos.Value.Y - TargetY) > 0.7)
                                         {
                                             //Console.WriteLine("Goalie: moving to y=" + TargetY);
                                             MovingOnGoalLine = true;
-                                            MoveToPosition(new PointF(StartingPosition.X, TargetY), ballPos.Value);
+                                            MoveToPosition(new PointF(StartingPosition.X, TargetY), ballPos.Value,
+                                                fast: false);
                                         }
                                     }
                                 }
@@ -205,7 +210,7 @@ namespace player.Entities.Players
                                 else
                                 {
                                     // Move to the ball and kick
-                                    if (MoveToPosition(ballPos.Value, null, approximate: true))
+                                    if (MoveToPosition(ballPos.Value, null, approximate: true, fast: false))
                                     {
                                         KickToOppGoal();
                                     }
