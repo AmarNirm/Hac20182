@@ -19,9 +19,9 @@ namespace RoboCup
             : base(team, coach)
         {
             if(m_side == 'l')
-                m_startPosition = new PointF(-25, 9);
+                m_startPosition = new PointF(35, 9);
             else
-                m_startPosition = new PointF(25, 9);
+                m_startPosition = new PointF(-35, 9);
         }
 
         public override void play()
@@ -78,9 +78,10 @@ namespace RoboCup
         {
             PointF OtherAttacker = FindAttackerPosition();
             
+
             if(OtherAttacker.Y >= 5)
                 MoveToPosition(new PointF(m_startPosition.X, m_startPosition.Y*-1), null);
-            else if (OtherAttacker.Y <= -5)
+            else 
                 MoveToPosition(m_startPosition, null);
         }
 
