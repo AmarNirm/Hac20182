@@ -111,7 +111,7 @@ namespace player.Entities.Players
                     {
                         if (!_init)
                         {
-                            _init = MoveToPosition(StartingPosition, OpponentGoal);
+                            _init = MoveToPosition(StartingPosition, OpponentGoal, approximate:true);
                         }
                         else
                         {
@@ -125,80 +125,112 @@ namespace player.Entities.Players
                             if (ballPos == null)
                             {
                             }
-                            else if (Utils.Distance(MyGoal, ballPos.Value) > 22.0
-                            ) // If the ball is far from the goal, turn to it / return to goal
+                            else
                             {
-                                var me = GetCurrPlayer();
-                                // If we're far from the starting position (only on X axis), return to it
-                                if (Math.Abs(me.Pos.Value.X - StartingPosition.X) > DistanceThreshold + 0.2)
+                                // If the ball is about to enter the goal, go to the intersection point and kick!
+                                var isBallGoingToGoal = false;
+                                PointF predictedBall = new PointF();
+                                if (ball.VelX != null && ball.VelY != null)
                                 {
-                                    //Console.WriteLine("Goalie: returning to starting position");
-                                    MoveToPosition(StartingPosition, ballPos.Value, fast: false);
+                                    var ballVelX = (float) ball.VelX;
+                                    var ballVelY = (float) ball.VelY;
+                                    float deltaX = (float) (ballVelX / 1.4 * 30);
+                                    float deltaY = (float) (ballVelY / 1.4 * 30);
+                                    predictedBall = new PointF(ballPos.Value.X + deltaX,
+                                        ballPos.Value.Y + deltaY);
+                                    //Console.WriteLine($"ballVelX={ballVelX}, ballVelY={ballVelY}");
+                                    //Console.WriteLine($"ball in {ballPos}, predicted in {predictedBall}");
+                                    isBallGoingToGoal =
+                                        Math.Abs(predictedBall.X) >= 52.5 && Math.Abs(predictedBall.Y) <= 7.8;
                                 }
-                                else
-                                {
-                                    if (MovingOnGoalLine) // Finish walking
-                                    {
-                                        if (MoveToPosition(new PointF(StartingPosition.X, TargetY), ballPos.Value,
-                                            fast: false))
-                                        {
-                                            //Console.WriteLine("Goalie: finished moving");
-                                            MovingOnGoalLine = false;
-                                        }
-                                    }
-                                    else if (TurnTowards(ballPos.Value))
-                                    {
-                                        // Check if we should move on the goal line
-                                        var myAngleAbs = Math.Abs(me.BodyAngle.Value);
-                                        // The absolute angle to the ball can be between 90 and 180 (in case of side=r), so move to [0,90] and normalize:
-                                        // [0, 1] when 0=straight, 1=90 degrees (vertical)
-                                        var myAngleNorm = (m_side == 'r') ? (180 - myAngleAbs) / 90 : myAngleAbs / 90;
-                                        if (myAngleNorm * ballPos.Value.Y < 0)
-                                        {
-                                            myAngleNorm *= -1;
-                                        }
 
-                                        // decrease the norm, because we prefer to stay close to the center of the goal
-                                        myAngleNorm *= 0.8f;
-                                        TargetY = HalfGoalLength * myAngleNorm;
-                                        if (Math.Abs(me.Pos.Value.Y - TargetY) > 0.7)
-                                        {
-                                            //Console.WriteLine("Goalie: moving to y=" + TargetY);
-                                            MovingOnGoalLine = true;
-                                            MoveToPosition(new PointF(StartingPosition.X, TargetY), ballPos.Value,
-                                                fast: false);
-                                        }
+                                if (isBallGoingToGoal)
+                                {
+                                    Console.WriteLine("Goalie is going to save the day!");
+                                    // calc the intersection point
+                                    var y = predictedBall.Y;
+                                    var target = new PointF(StartingPosition.X, y);
+                                    if (MoveToPosition(target, null, approximate: true, fast: true))
+                                    {
+                                        KickWithProb(OpponentGoal);
                                     }
                                 }
-                            }
-                            else // The ball is close to the goal -> move forward to the ball / catch / kick
-                            {
-                                var me = GetCurrPlayer();
-                                double ballDirection = CalcAngleToPoint(ballPos.Value);
-                                //  Catch only if we're in the penalty box and the ball is very close
-                                if (Math.Abs(me.Pos.Value.X - StartingPosition.X) < 12 &&
-                                    Math.Abs(me.Pos.Value.Y - StartingPosition.Y) < 12 &&
-                                    GetDistanceFrom(ballPos.Value) < 1.7 &&
-                                    Math.Abs(ballDirection) < 90)
+                                else if (Utils.Distance(MyGoal, ballPos.Value) > 22.0
+                                ) // If the ball is far from the goal, turn to it / return to goal
                                 {
-                                    //Console.WriteLine($"Catching in direction {ballDirection}");
-                                    var rand = RandomGenerator.NextDouble();
-                                    if (rand < 0.50)
+                                    var me = GetCurrPlayer();
+                                    // If we're far from the starting position (only on X axis), return to it
+                                    if (Math.Abs(me.Pos.Value.X - StartingPosition.X) > DistanceThreshold + 0.2)
                                     {
-                                        m_robot.Catch(ballDirection);
+                                        //Console.WriteLine("Goalie: returning to starting position");
+                                        MoveToPosition(StartingPosition, ballPos.Value, fast: false);
                                     }
                                     else
                                     {
-                                        // Kick toward the opponent goal, but pick the exact angle randomly
-                                        KickWithProb(OpponentGoal);
+                                        if (MovingOnGoalLine) // Finish walking
+                                        {
+                                            if (MoveToPosition(new PointF(StartingPosition.X, TargetY), ballPos.Value,
+                                                fast: false))
+                                            {
+                                                //Console.WriteLine("Goalie: finished moving");
+                                                MovingOnGoalLine = false;
+                                            }
+                                        }
+                                        else if (TurnTowards(ballPos.Value))
+                                        {
+                                            // Check if we should move on the goal line
+                                            var myAngleAbs = Math.Abs(me.BodyAngle.Value);
+                                            // The absolute angle to the ball can be between 90 and 180 (in case of side=r), so move to [0,90] and normalize:
+                                            // [0, 1] when 0=straight, 1=90 degrees (vertical)
+                                            var myAngleNorm =
+                                                (m_side == 'r') ? (180 - myAngleAbs) / 90 : myAngleAbs / 90;
+                                            if (myAngleNorm * ballPos.Value.Y < 0)
+                                            {
+                                                myAngleNorm *= -1;
+                                            }
+
+                                            // decrease the norm, because we prefer to stay close to the center of the goal
+                                            myAngleNorm *= 0.8f;
+                                            TargetY = HalfGoalLength * myAngleNorm;
+                                            if (Math.Abs(me.Pos.Value.Y - TargetY) > 0.7)
+                                            {
+                                                //Console.WriteLine("Goalie: moving to y=" + TargetY);
+                                                MovingOnGoalLine = true;
+                                                MoveToPosition(new PointF(StartingPosition.X, TargetY), ballPos.Value,
+                                                    fast: false);
+                                            }
+                                        }
                                     }
                                 }
-                                else
+                                else // The ball is close to the goal -> move forward to the ball / catch / kick
                                 {
-                                    // Move to the ball and kick
-                                    if (MoveToPosition(ballPos.Value, null, approximate: true, fast: false))
+                                    var me = GetCurrPlayer();
+                                    double ballDirection = CalcAngleToPoint(ballPos.Value);
+                                    //  Catch only if we're in the penalty box and the ball is very close
+                                    if (Math.Abs(me.Pos.Value.X - StartingPosition.X) < 12 &&
+                                        Math.Abs(me.Pos.Value.Y - StartingPosition.Y) < 12 &&
+                                        GetDistanceFrom(ballPos.Value) < 1.7 &&
+                                        Math.Abs(ballDirection) < 90)
                                     {
-                                        KickWithProb(OpponentGoal);
+                                        //Console.WriteLine($"Catching in direction {ballDirection}");
+                                        var rand = RandomGenerator.NextDouble();
+                                        if (rand < 0.50)
+                                        {
+                                            m_robot.Catch(ballDirection);
+                                        }
+                                        else
+                                        {
+                                            // Kick toward the opponent goal, but pick the exact angle randomly
+                                            KickWithProb(OpponentGoal);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // Move to the ball and kick
+                                        if (MoveToPosition(ballPos.Value, null, approximate: true, fast: false))
+                                        {
+                                            KickWithProb(OpponentGoal);
+                                        }
                                     }
                                 }
                             }
