@@ -58,7 +58,7 @@ namespace RoboCup
                         {
                             if (AmITheClosesDefenderToBall())
                             {
-                                AdvanceToBall(ball);
+                                MoveToPosition(ball.Pos.Value, null);
                             }
                             else
                             {
@@ -121,27 +121,7 @@ namespace RoboCup
             var angleToPoint = CalcAngleToPoint(targetPoint);
             m_robot.Kick(100, angleToPoint);
         }
-
-        private void AdvanceToBall(SeenCoachObject ball)
-        {
-            float distanceToBall = GetDistanceFrom(ball.Pos.Value);
-            float directionToBall = CalcAngleToPoint(ball.Pos.Value);
-            bool isDirectionZero = Math.Abs(directionToBall) < 1;
-
-            // If ball is too far then
-            // turn to ball or 
-            // if we have correct direction then go to ball
-            if ((distanceToBall >= 6 && !isDirectionZero) ||
-                (distanceToBall < 6 && Math.Abs(directionToBall) > 10))
-            {
-                m_robot.Turn(directionToBall);
-            }
-            else
-            {
-                m_robot.Dash(100);
-            }
-        }
-
+        
         private SeenObject FindGoal()
         {
             SeenObject obj;
