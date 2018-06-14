@@ -77,12 +77,11 @@ namespace RoboCup
                         }
                         else
                         {
-                            //KickToGoal();
                             //if distance is too far for the ball to reach the attacker
-                            if(GetDistanceFrom(FindAttackerPosition())>28)
-                                m_robot.Kick(20, CalcAngleToPoint(FindAttackerPosition()));
+                            if (AmIInMyHalf() && GetDistanceFrom(FindAttackerPosition()) > 28)
+                                Kick(FindAttackerPosition(), 20);
                             else
-                                KickTowardsTeamMate(FindAttackerPosition());
+                                Kick(FindAttackerPosition());
                         }
                     }
                     else
@@ -109,70 +108,7 @@ namespace RoboCup
                 }
             }
         }
-
-        private void KickToGoal()
-        {
-            PointF targetPoint = OpponentGoal;
-            if (Utils.GetRandomBoolean())
-                targetPoint.Y += 3F;
-            else
-                targetPoint.Y -= 3F;
-
-            var angleToPoint = CalcAngleToPoint(targetPoint);
-            m_robot.Kick(100, angleToPoint);
-        }
         
-        private SeenObject FindGoal()
-        {
-            SeenObject obj;
-
-            while (!m_timeOver)
-            {
-                // We know where is ball and we can kick it
-                // so look for goal
-                if (m_side == 'l')
-                    obj = m_memory.GetSeenObject("goal r");
-                else
-                    obj = m_memory.GetSeenObject("goal l");
-
-                if (obj == null)
-                {
-                    m_robot.Turn(40);
-                    m_memory.waitForNewInfo();
-                }
-                else
-                {
-                    return obj;
-                }
-
-                // sleep one step to ensure that we will not send
-                // two commands in one cycle.
-                try
-                {
-                    Thread.Sleep(2 * SoccerParams.simulator_step);
-                }
-                catch (Exception e)
-                {
-
-                }
-            }
-
-            return null;
-        }
-
-        private SenseBodyInfo GetBodyInfo()
-        {
-            m_robot.SenseBody();
-            SenseBodyInfo bodyInfo = null;
-            while (bodyInfo == null)
-            {
-                Thread.Sleep(WAIT_FOR_MSG_TIME);
-                bodyInfo = m_memory.getBodyInfo();
-            }
-
-            return bodyInfo;
-        }
-
         public bool IsBallInMyHalf()
         {
             var ball = GetBall();
