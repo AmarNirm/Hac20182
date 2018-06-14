@@ -23,7 +23,7 @@ namespace RoboCup
 
         public override void play()
         {
-            //Thread.Sleep(5000);
+            
             // first move to start position
             m_robot.Move(m_startPosition.X, m_startPosition.Y);
 
@@ -36,7 +36,7 @@ namespace RoboCup
                 {
                     ball = GetBall();
 
-                    if (GetDistanceFrom(ball.Pos.Value) <= 5.5)
+                    if (GetDistanceFrom(ball.Pos.Value) <= 9)
                     {
                         if (GetDistanceFrom(ball.Pos.Value) <= 1.5)
                         {
@@ -47,9 +47,9 @@ namespace RoboCup
                     }
                     else
                     {
+                        
                         AdvanceToStartPoint();
                     }
-
 
                     // sleep one step to ensure that we will not send
                     // two commands in one cycle.
@@ -73,9 +73,9 @@ namespace RoboCup
         {
             PointF upInitialPoint = new PointF(25, 9);
             if (m_side == 'l')
-                upInitialPoint.X = 29;
+                upInitialPoint.X = 25;
             else
-                upInitialPoint.X *= -29;
+                upInitialPoint.X = -25;
 
             MoveToPosition(upInitialPoint, null);
         }
@@ -97,7 +97,19 @@ namespace RoboCup
             }
             else
             {
-                m_robot.Kick(20, CalcAngleToPoint(goal.Value));
+                //check is it better to pass than dribel
+                int OtherAttackerNumber;
+                if (m_number == 2)
+                    OtherAttackerNumber = 3;
+                else
+                    OtherAttackerNumber = 2;
+
+                var OtherAttacker = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {OtherAttackerNumber}");
+                var Me = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {m_number}");
+                if (Math.Abs(OtherAttacker.Pos.Value.X) - Math.Abs(Me.Pos.Value.X) > 10)
+                    KickTowardsTeamMate(OtherAttacker.Pos.Value);
+                else
+                    m_robot.Kick(20, CalcAngleToPoint(goal.Value));
             }
         }
 

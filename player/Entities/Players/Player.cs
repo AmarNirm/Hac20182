@@ -301,6 +301,20 @@ namespace RoboCup
             }
         }
 
+        protected PointF FindAttackerPosition()
+        {
+            int CloserAttacker = FindAtackerClosestToTheBall();
+            var Attacker = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {CloserAttacker}");
+            return Attacker.Pos.Value;
+        }
+
+        protected void KickTowardsTeamMate(PointF TeamMatePos)
+        {
+            PointF targetPoint = TeamMatePos;
+            var angleToPoint = CalcAngleToPoint(targetPoint);
+            m_robot.Kick(100, angleToPoint);
+        }
+
         protected SeenCoachObject GetBall()
         {
             while (!m_timeOver)
@@ -327,7 +341,6 @@ namespace RoboCup
                 var currPlayer = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {m_number}");
                 if (currPlayer == null)
                 {
-                    Console.WriteLine("currPlayer == null");
                     continue;
                 }
                 else
