@@ -158,10 +158,10 @@ namespace RoboCup
             {
                 //check if it is better to pass than dribel
                 int OtherAttackerNumber;
-                if (m_number == 2)
-                    OtherAttackerNumber = 3;
-                else
+                if (m_number == 1)
                     OtherAttackerNumber = 2;
+                else
+                    OtherAttackerNumber = 1;
 
                 var OtherAttacker = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {OtherAttackerNumber}");
                 var Me = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {m_number}");

@@ -120,7 +120,7 @@ namespace RoboCup
             else
                 targetPoint.Y -= 3F;
 
-            if (GetDistanceFrom(targetPoint) < 20)
+            if (GetDistanceFrom(targetPoint) < 24)
             {
                 Kick(targetPoint);
             }
@@ -129,7 +129,7 @@ namespace RoboCup
                 //check is it better to pass than dribel
                 int OtherAttackerNumber;
                 if (m_number == 2)
-                    OtherAttackerNumber = 3;
+                    OtherAttackerNumber = 1;
                 else
                     OtherAttackerNumber = 2;
 

@@ -45,7 +45,7 @@ namespace RoboCup
             var teamName = isGoalie ? m_team.m_teamName + " (version 6) (goalie)" : m_team.m_teamName;
             m_robot.Init(teamName, out m_side, out m_number, out m_playMode);
 
-            Console.WriteLine("New Player - Team: " + m_team.m_teamName + " Side:" + m_side + " Num:" + m_number);
+            //Console.WriteLine("New Player - Team: " + m_team.m_teamName + " Side:" + m_side + " Num:" + m_number);
 
             m_strategy = new Thread(play);
             m_strategy.Start();

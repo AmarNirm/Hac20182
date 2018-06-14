@@ -86,18 +86,18 @@ namespace player.Entities.Players
                             }
                         }*/
 
-                        Console.WriteLine("Goalie in free kick mode");
+                       // Console.WriteLine("Goalie in free kick mode");
                         float distance = GetDistanceFrom(FreeKickPos);
                         Debug.WriteLine($"distance to FreeKickPos = {distance}");
                         if (distance > DistanceThreshold)
                         {
-                            Console.WriteLine($"Goalie move to {FreeKickPos}");
+                           // Console.WriteLine($"Goalie move to {FreeKickPos}");
                             m_robot.Move(FreeKickPos.X, FreeKickPos.Y); // move in the penalty box
                         }
                         else
                         {
                             // Kick horizontally
-                            Console.WriteLine("Goalie in position");
+                           // Console.WriteLine("Goalie in position");
                             var me = GetCurrPlayer();
                             if (TurnTowards(new PointF(OpponentGoal.X, me.Pos.Value.Y)))
                             {
@@ -146,7 +146,7 @@ namespace player.Entities.Players
 
                                 if (isBallGoingToGoal)
                                 {
-                                    Console.WriteLine("Goalie is going to save the day!");
+                                    //Console.WriteLine("Goalie is going to save the day!");
                                     // calc the intersection point
                                     var y = predictedBall.Y;
                                     var target = new PointF(StartingPosition.X, y);
