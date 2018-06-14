@@ -31,41 +31,55 @@ namespace RoboCup
             PointF? goal;
 
 
-            while (!m_timeOver)
-            {
-                Console.WriteLine(m_playMode);
+            //while (!m_timeOver)
+            //{
+            //    Console.WriteLine(m_playMode);
 
-                PointF teamMate = new PointF(2, -33);
-                if (m_side == 'l')
-                    teamMate.X *= -1;
+            //    PointF teamMate = new PointF(2, -33);
+            //    if (m_side == 'l')
+            //        teamMate.X *= -1;
 
-                ball = GetBall();
-                if (GetDistanceFrom(ball.Pos.Value) > 1.5)
-                {
-                    MoveToPosition(ball.Pos.Value, teamMate);
-                }
-                else
-                {
-                    Kick(teamMate);
-                    while (true)
-                    {
-                        Console.WriteLine("nir");
-                    }
-                    //break;
-                }
+            //    bool notArrived = true;
+            //    while (notArrived)
+            //    {
+            //        PointF pointNearBall = new PointF(2, 0);
+            //        if (m_side == 'l')
+            //            pointNearBall.X *= -1;
+            //        MoveToPosition(pointNearBall, pointNearBall);
+            //        Thread.Sleep(2 * SoccerParams.simulator_step);
+            //        if (Math.Abs(GetCurrPlayer().Pos.Value.Y - 2) == 1)
+            //            notArrived = false;
+            //    }
+            //    ball = GetBall();
+            //    TurnTowards(ball.Pos.Value);
+            //    Thread.Sleep(SoccerParams.simulator_step);
+
+            //    if (GetDistanceFrom(ball.Pos.Value) > 1.5)
+            //    {
+            //        MoveToPosition(ball.Pos.Value, teamMate);
+            //    }
+            //    else
+            //    {
+            //        Kick(teamMate);
+            //        while (true)
+            //        {
+            //            Console.WriteLine("nir");
+            //        }
+            //        //break;
+            //    }
 
 
-                // sleep one step to ensure that we will not send
-                // two commands in one cycle.
-                try
-                {
-                    Thread.Sleep(2 * SoccerParams.simulator_step);
-                }
-                catch (Exception e)
-                {
+            //    // sleep one step to ensure that we will not send
+            //    // two commands in one cycle.
+            //    try
+            //    {
+            //        Thread.Sleep(2 * SoccerParams.simulator_step);
+            //    }
+            //    catch (Exception e)
+            //    {
 
-                }
-            }
+            //    }
+            //}
 
             while (!m_timeOver)
             {
