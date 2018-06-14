@@ -46,7 +46,7 @@ namespace RoboCup
                 }
                 else
                 {
-                    KickTowardsTeamMate(teamMate);
+                    Kick(teamMate);
                     while (true)
                     {
                         Console.WriteLine("nir");
@@ -126,16 +126,14 @@ namespace RoboCup
             //PointF downInitialPoint = new PointF(26, 51);
             MoveToPosition(upInitialPoint, null);
         }
-        
+
         private void KickToGoal(PointF? goal)
         {
-            try
-            {
-                PointF targetPoint = OpponentGoal;
-                if (Utils.GetRandomBoolean())
-                    targetPoint.Y += 3F;
-                else
-                    targetPoint.Y -= 3F;
+            PointF targetPoint = OpponentGoal;
+            if (Utils.GetRandomBoolean())
+                targetPoint.Y += 3F;
+            else
+                targetPoint.Y -= 3F;
 
             if (GetDistanceFrom(targetPoint) < 25)
             {
