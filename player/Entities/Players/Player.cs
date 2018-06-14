@@ -115,8 +115,28 @@ namespace RoboCup
         /// <param name="targetTowards"></param>
         /// <param name="approximate">If the distance threshold should be bigger</param>
         /// <returns>true if got into the required position (including angle)</returns>
-        protected bool MoveToPosition(PointF targetPos, PointF? targetTowards, bool approximate = false)
+        protected bool MoveToPosition(PointF targetPos, PointF? targetTowards, bool approximate = false,
+            bool fast = true)
         {
+            // Check if we need to change the target (in case of a backwards kick)
+            var myPos = GetCurrPlayer().Pos.Value;
+            var goalPos = GetGoalPosition(false).Value;
+            var behind = (m_side == 'l')
+                ? myPos.X > targetPos.X + 0.4 && myPos.X < goalPos.X
+                : myPos.X < targetPos.X - 0.4 && myPos.X > goalPos.X;
+            if (behind)
+            {
+                Console.WriteLine("Ball behind: correcting target");
+                if (myPos.Y > targetPos.Y)
+                {
+                    targetPos.Y += 2;
+                }
+                else
+                {
+                    targetPos.Y -= 2;
+                }
+            }
+
             var distanceThreshold = approximate ? DistanceThreshold + 0.8 : DistanceThreshold;
             float distance = GetDistanceFrom(targetPos);
             Debug.WriteLine($"distance to target = {distance}");
@@ -125,9 +145,15 @@ namespace RoboCup
                 bool res = TurnTowards(targetPos);
                 if (res)
                 {
-                    // Slow down a bit when approaching the target
-                    Debug.WriteLine($"Player at side={m_side}, num={m_number} is dashing to {targetPos}");
-                    m_robot.Dash(70 * distance);
+                    if (fast)
+                    {
+                        m_robot.Dash(100);
+                    }
+                    else
+                    {
+                        // Slow down a bit when approaching the target
+                        m_robot.Dash(70 * distance);
+                    }
                 }
             }
             else // Already got to the position, now just need to turn
@@ -145,12 +171,21 @@ namespace RoboCup
                     return true;
                 }
             }
+
             return false;
         }
 
         protected bool TurnTowards(PointF target)
         {
             float relAngle = CalcAngleToPoint(target);
+            float distanceToTarget = GetDistanceFrom(target);
+
+            if ((distanceToTarget >= 6 && Math.Abs(relAngle) >= AngleThreshold) ||
+                (distanceToTarget < 6 && Math.Abs(relAngle) > 10))
+            {
+                m_robot.Turn(relAngle);
+            }
+
             if (Math.Abs(relAngle) >= AngleThreshold)
             {
                 Debug.WriteLine($"Player at side={m_side}, num={m_number} is turning {relAngle} degrees");
@@ -160,6 +195,7 @@ namespace RoboCup
             {
                 return true;
             }
+
             return false;
         }
 

@@ -147,7 +147,7 @@ namespace player.Entities.Players
                                 if (Math.Abs(me.Pos.Value.X - StartingPosition.X) > DistanceThreshold)
                                 {
                                     //Console.WriteLine("Goalie: returning to starting position");
-                                    MoveToPosition(StartingPosition, ballPos.Value);
+                                    MoveToPosition(StartingPosition, ballPos.Value, fast: false);
                                 }
                                 else
                                 {
