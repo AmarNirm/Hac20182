@@ -30,6 +30,43 @@ namespace RoboCup
             SeenCoachObject ball;
             PointF? goal;
 
+
+            while (!m_timeOver)
+            {
+                Console.WriteLine(m_playMode);
+
+                PointF teamMate = new PointF(2, -33);
+                if (m_side == 'l')
+                    teamMate.X *= -1;
+
+                ball = GetBall();
+                if (GetDistanceFrom(ball.Pos.Value) > 1.5)
+                {
+                    MoveToPosition(ball.Pos.Value, teamMate);
+                }
+                else
+                {
+                    Kick(teamMate);
+                    while (true)
+                    {
+                        Console.WriteLine("nir");
+                    }
+                    //break;
+                }
+
+
+                // sleep one step to ensure that we will not send
+                // two commands in one cycle.
+                try
+                {
+                    Thread.Sleep(2 * SoccerParams.simulator_step);
+                }
+                catch (Exception e)
+                {
+
+                }
+            }
+
             while (!m_timeOver)
             {
                 try
@@ -70,7 +107,7 @@ namespace RoboCup
 
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     Console.WriteLine("basa");
                 }
@@ -89,11 +126,11 @@ namespace RoboCup
             //PointF downInitialPoint = new PointF(26, 51);
             MoveToPosition(upInitialPoint, null);
         }
-        
+
         private void KickToGoal(PointF? goal)
         {
             PointF targetPoint = OpponentGoal;
-            if(Utils.GetRandomBoolean())
+            if (Utils.GetRandomBoolean())
                 targetPoint.Y += 3F;
             else
                 targetPoint.Y -= 3F;
