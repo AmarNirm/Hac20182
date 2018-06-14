@@ -11,17 +11,17 @@ using RoboCup.Infrastructure;
 
 namespace RoboCup
 {
-    public class EnglandAttackerFront : Player
+    public class EnglandAttackerBack : Player
     {
         private const int WAIT_FOR_MSG_TIME = 10;
 
-        public EnglandAttackerFront(Team team, ICoach coach)
+        public EnglandAttackerBack(Team team, ICoach coach)
             : base(team, coach)
         {
-            if(m_side == 'l')
-                m_startPosition = new PointF(35, 9);
+            if (m_side == 'l')
+                m_startPosition = new PointF(35, -9);
             else
-                m_startPosition = new PointF(-35, 9);
+                m_startPosition = new PointF(-35, -9);
         }
 
         public override void play()
@@ -29,8 +29,8 @@ namespace RoboCup
             SeenCoachObject ball;
             PointF? goal;
             //after gaol, first move to start position
-           
-           
+
+
             while (!m_timeOver)
             {
                 try
@@ -41,7 +41,7 @@ namespace RoboCup
                     ball = GetBall();
 
                     //if (GetDistanceFrom(ball.Pos.Value) <= 9)
-                    if(FindAtackerClosestToTheBall()==m_number)
+                    if (FindAtackerClosestToTheBall() == m_number)
                     {
                         if (GetDistanceFrom(ball.Pos.Value) <= 1.5)
                         {
@@ -77,11 +77,11 @@ namespace RoboCup
         public void GoToOtherWing()
         {
             PointF OtherAttacker = FindAttackerPosition();
-            
 
-            if(OtherAttacker.Y >= 5)
-                MoveToPosition(new PointF(m_startPosition.X, m_startPosition.Y*-1), null);
-            else 
+
+            if (OtherAttacker.Y >= 5)
+                MoveToPosition(new PointF(m_startPosition.X, m_startPosition.Y * -1), null);
+            else
                 MoveToPosition(m_startPosition, null);
         }
 
@@ -96,7 +96,7 @@ namespace RoboCup
 
             MoveToPosition(upInitialPoint, null);
         }
-        
+
         private void KickToGoal(PointF? goal)
         {
             PointF targetPoint = OpponentGoal;
@@ -104,7 +104,7 @@ namespace RoboCup
                 targetPoint.Y += 3F;
             else
                 targetPoint.Y -= 3F;
-            
+
             if (GetDistanceFrom(targetPoint) < 25)
             {
                 Kick(targetPoint);
