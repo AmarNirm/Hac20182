@@ -126,7 +126,7 @@ namespace RoboCup
                 : myPos.X < targetPos.X - 0.4 && myPos.X > goalPos.X;
             if (behind)
             {
-                Console.WriteLine("Ball behind: correcting target");
+                //Console.WriteLine("Ball behind: correcting target");
                 if (myPos.Y > targetPos.Y)
                 {
                     targetPos.Y += 1;

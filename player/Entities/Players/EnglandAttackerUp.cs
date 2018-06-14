@@ -30,6 +30,43 @@ namespace RoboCup
             SeenCoachObject ball;
             PointF? goal;
 
+
+            while (!m_timeOver)
+            {
+                Console.WriteLine(m_playMode);
+
+                PointF teamMate = new PointF(2, -33);
+                if (m_side == 'l')
+                    teamMate.X *= -1;
+
+                ball = GetBall();
+                if (GetDistanceFrom(ball.Pos.Value) > 1.5)
+                {
+                    MoveToPosition(ball.Pos.Value, teamMate);
+                }
+                else
+                {
+                    KickTowardsTeamMate(teamMate);
+                    while (true)
+                    {
+                        Console.WriteLine("nir");
+                    }
+                    //break;
+                }
+
+
+                // sleep one step to ensure that we will not send
+                // two commands in one cycle.
+                try
+                {
+                    Thread.Sleep(2 * SoccerParams.simulator_step);
+                }
+                catch (Exception e)
+                {
+
+                }
+            }
+
             while (!m_timeOver)
             {
                 try
@@ -70,7 +107,7 @@ namespace RoboCup
 
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     Console.WriteLine("basa");
                 }
@@ -92,34 +129,41 @@ namespace RoboCup
         
         private void KickToGoal(PointF? goal)
         {
-            PointF targetPoint = OpponentGoal;
-            if(Utils.GetRandomBoolean())
-                targetPoint.Y += 3F;
-            else
-                targetPoint.Y -= 3F;
-
-            var angleToPoint = CalcAngleToPoint(targetPoint);
-            
-            if (GetDistanceFrom(targetPoint) < 25)
+            try
             {
-                //Console.WriteLine(angleToPoint);
-                m_robot.Kick(100, angleToPoint);
+                PointF targetPoint = OpponentGoal;
+                if (Utils.GetRandomBoolean())
+                    targetPoint.Y += 3F;
+                else
+                    targetPoint.Y -= 3F;
+
+                var angleToPoint = CalcAngleToPoint(targetPoint);
+
+                if (GetDistanceFrom(targetPoint) < 25)
+                {
+                    //Console.WriteLine(angleToPoint);
+                    m_robot.Kick(100, angleToPoint);
+                }
+                else
+                {
+                    //check if it is better to pass than dribel
+                    int OtherAttackerNumber;
+                    if (m_number == 2)
+                        OtherAttackerNumber = 3;
+                    else
+                        OtherAttackerNumber = 2;
+
+                    var OtherAttacker = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {OtherAttackerNumber}");
+                    var Me = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {m_number}");
+                    if (Math.Abs(OtherAttacker.Pos.Value.X) - Math.Abs(Me.Pos.Value.X) > 10)
+                        KickTowardsTeamMate(OtherAttacker.Pos.Value);
+                    else
+                        m_robot.Kick(20, CalcAngleToPoint(goal.Value));
+                }
             }
-            else
+            catch (Exception e)
             {
-                //check if it is better to pass than dribel
-                int OtherAttackerNumber;
-                if (m_number == 2)
-                    OtherAttackerNumber = 3;
-                else
-                    OtherAttackerNumber = 2;
-
-                var OtherAttacker = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {OtherAttackerNumber}");
-                var Me = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {m_number}");
-                if (Math.Abs(OtherAttacker.Pos.Value.X) - Math.Abs(Me.Pos.Value.X) > 10)
-                    KickTowardsTeamMate(OtherAttacker.Pos.Value);
-                else
-                    m_robot.Kick(20, CalcAngleToPoint(goal.Value));
+                Console.WriteLine("basa 2");
             }
         }
 
