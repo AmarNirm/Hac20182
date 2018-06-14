@@ -98,12 +98,10 @@ namespace RoboCup
             else
                 targetPoint.Y -= 3F;
 
-            var angleToPoint = CalcAngleToPoint(targetPoint);
-            
             if (GetDistanceFrom(targetPoint) < 25)
             {
                 //Console.WriteLine(angleToPoint);
-                m_robot.Kick(100, angleToPoint);
+                Kick(targetPoint);
             }
             else
             {
@@ -117,9 +115,9 @@ namespace RoboCup
                 var OtherAttacker = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {OtherAttackerNumber}");
                 var Me = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {m_number}");
                 if (Math.Abs(OtherAttacker.Pos.Value.X) - Math.Abs(Me.Pos.Value.X) > 10)
-                    KickTowardsTeamMate(OtherAttacker.Pos.Value);
+                    Kick(OtherAttacker.Pos.Value);
                 else
-                    m_robot.Kick(20, CalcAngleToPoint(goal.Value));
+                    Kick(goal.Value, 20);
             }
         }
 

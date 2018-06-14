@@ -40,6 +40,7 @@ namespace RoboCup
             m_memory = new Memory();
             m_team = team;
             m_robot = new Robot(m_memory);
+            RandomGenerator = new Random();
 
             var teamName = isGoalie ? m_team.m_teamName + " (version 6) (goalie)" : m_team.m_teamName;
             m_robot.Init(teamName, out m_side, out m_number, out m_playMode);
@@ -118,22 +119,25 @@ namespace RoboCup
         protected bool MoveToPosition(PointF targetPos, PointF? targetTowards, bool approximate = false,
             bool fast = true)
         {
-            // Check if we need to change the target (in case of a backwards kick)
-            var myPos = GetCurrPlayer().Pos.Value;
-            var goalPos = GetGoalPosition(false).Value;
-            var behind = (m_side == 'l')
-                ? myPos.X > targetPos.X + 0.4 && myPos.X < goalPos.X
-                : myPos.X < targetPos.X - 0.4 && myPos.X > goalPos.X;
-            if (behind)
+            if (targetPos != new PointF(0, 0))
             {
-                Console.WriteLine("Ball behind: correcting target");
-                if (myPos.Y > targetPos.Y)
+                // Check if we need to change the target (in case of a backwards kick)
+                var myPos = GetCurrPlayer().Pos.Value;
+                var goalPos = GetGoalPosition(false).Value;
+                var behind = (m_side == 'l')
+                    ? myPos.X > targetPos.X + 0.4 && myPos.X < goalPos.X
+                    : myPos.X < targetPos.X - 0.4 && myPos.X > goalPos.X;
+                if (behind)
                 {
-                    targetPos.Y += 1;
-                }
-                else
-                {
-                    targetPos.Y -= 1;
+                    Console.WriteLine("Ball behind: correcting target");
+                    if (myPos.Y > targetPos.Y)
+                    {
+                        targetPos.Y += 1;
+                    }
+                    else
+                    {
+                        targetPos.Y -= 1;
+                    }
                 }
             }
 
@@ -182,7 +186,7 @@ namespace RoboCup
 
             //if ((distanceToTarget >= 6 && Math.Abs(relAngle) >= AngleThreshold) ||
             //    (distanceToTarget < 6 && Math.Abs(relAngle) > 10))
-            if (Math.Abs(relAngle) > 3)
+            if (Math.Abs(relAngle) > AngleThreshold)
             {
                 m_robot.Turn(relAngle);
             }
@@ -296,18 +300,52 @@ namespace RoboCup
             }
         }
 
+        public Random RandomGenerator { get; set; }
+
         protected PointF FindAttackerPosition()
         {
             int CloserAttacker = FindAtackerClosestToTheBall();
             var Attacker = m_coach.GetSeenCoachObject($"player {m_team.m_teamName} {CloserAttacker}");
             return Attacker.Pos.Value;
         }
-
-        protected void KickTowardsTeamMate(PointF TeamMatePos)
+        
+        public void KickWithProb(PointF target, int power = 100)
         {
-            PointF targetPoint = TeamMatePos;
-            var angleToPoint = CalcAngleToPoint(targetPoint);
-            m_robot.Kick(100, angleToPoint);
+            // Kick towards the opponent goal, but pick the exact angle randomly
+            var angleToTarget = CalcAngleToPoint(target);
+            var rand = RandomGenerator.NextDouble();
+            rand -= 0.5;
+            rand *= 2; // rand is in [-1,1]
+            var kickAngle = angleToTarget + 60 * rand;
+            m_robot.Kick(power, kickAngle);
+        }
+
+        public void Kick(PointF target, int power = 100)
+        {
+            TimeSpan timeSinceLastKick = new TimeSpan(DateTime.UtcNow.Ticks) - new TimeSpan(LastKickTime);
+            if (timeSinceLastKick.TotalMilliseconds < 500)
+            {
+                KickWithProb(target);
+            }
+            else
+            {
+                var angleToTarget = CalcAngleToPoint(target);
+                m_robot.Kick(power, angleToTarget);
+            }
+
+            LastKickTime = DateTime.UtcNow.Ticks;
+        }
+
+        public bool AmIInMyHalf()
+        {
+            var myPos = GetCurrPlayer().Pos.Value;
+            bool onMySide;
+            if (m_side == 'l')
+                onMySide = myPos.X <= 5;
+            else
+                onMySide = myPos.X >= -5;
+
+            return onMySide;
         }
 
         protected SeenCoachObject GetBall()
@@ -476,5 +514,6 @@ namespace RoboCup
 
         protected float DistanceThreshold = 0.4f;
         protected float AngleThreshold = 3f;
+        protected long LastKickTime;
     }
 }

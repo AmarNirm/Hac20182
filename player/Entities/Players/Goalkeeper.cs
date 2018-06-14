@@ -25,10 +25,7 @@ namespace player.Entities.Players
             : base(team, coach, isGoalie: true)
         {
             FreeKickModeStr = $"free_kick_{m_side}";
-            RandomGenerator = new Random();
         }
-
-        public Random RandomGenerator { get; set; }
 
         private bool _init;
 
@@ -62,17 +59,6 @@ namespace player.Entities.Players
                 y *= -1;
             }
             return new PointF(x, y);
-        }
-
-        private void KickToOppGoal()
-        {
-            // Kick towards the opponent goal, but pick the exact angle randomly
-            var angleToOpponentGoal = CalcAngleToPoint(OpponentGoal);
-            var rand = RandomGenerator.NextDouble();
-            rand -= 0.5;
-            rand *= 2; // rand is in [-1,1]
-            var kickAngle = angleToOpponentGoal + 60 * rand;
-            m_robot.Kick(100, kickAngle);
         }
 
         public override void play()
@@ -116,7 +102,7 @@ namespace player.Entities.Players
                             if (TurnTowards(new PointF(OpponentGoal.X, me.Pos.Value.Y)))
                             {
                                 //Console.WriteLine("Goalie: kick!");
-                                m_robot.Kick(100, 0); // Kick horizontally towards the opponent goal
+                                Kick(new PointF(OpponentGoal.X, me.Pos.Value.Y)); // Kick horizontally towards the opponent goal
                                 m_playMode = "";
                             }
                         }
@@ -204,7 +190,7 @@ namespace player.Entities.Players
                                     else
                                     {
                                         // Kick toward the opponent goal, but pick the exact angle randomly
-                                        KickToOppGoal();
+                                        KickWithProb(OpponentGoal);
                                     }
                                 }
                                 else
@@ -212,7 +198,7 @@ namespace player.Entities.Players
                                     // Move to the ball and kick
                                     if (MoveToPosition(ballPos.Value, null, approximate: true, fast: false))
                                     {
-                                        KickToOppGoal();
+                                        KickWithProb(OpponentGoal);
                                     }
                                 }
                             }
